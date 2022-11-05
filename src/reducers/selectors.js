@@ -1,15 +1,11 @@
 export const getSubjectsList = state => {
-  const selectedGrade = state.app.gradeSelected;
-  return state.app.courseCategories.filter(
+  const selectedGrade = state.app?.gradeSelected;
+  return state.app?.courseCategories?.filter(
     value =>
       value.slug.indexOf('_sub') > -1 &&
       value.slug.indexOf(`_${selectedGrade}`) > -1,
   );
 };
-
-math_marathi_11
-english_english_11
-math_marathi_11
 
 export const getCourses = state => state.app.courses;
 

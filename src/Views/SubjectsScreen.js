@@ -79,7 +79,7 @@ const SubjectsScreen = () => {
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
     
       <View style={styles.sectionContainer}>
-        <Text style={styles.main}>Hi, <Text style={styles.mainSub}>Friend!</Text></Text>
+        {/* <Text style={styles.main}>Hi, <Text style={styles.mainSub}>Friend!</Text></Text> */}
          <Text style={styles.mainSubDesc}>Select Subject</Text>
         <FlatList
           scrollEnabled
