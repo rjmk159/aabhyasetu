@@ -1,42 +1,41 @@
-import React, {useEffect} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
-import {StyleSheet, Dimensions, ScrollView, FlatList} from 'react-native';
-import {Block, Text, theme} from 'galio-framework';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
+import { Block, Text } from "galio-framework";
+import React, { useEffect } from "react";
+import { Dimensions, FlatList, StyleSheet } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
-import CourseCard from '../components/cards';
-import {
-  fetchCoursesList,
-  setCurrentCourse,
-} from '../reducers/app.reducers';
-import {getCourses} from '../reducers/selectors';
-import {screens} from '../constants/screens';
-const {width} = Dimensions.get('screen');
+import CourseCard from "../components/cards";
+import { screens } from "../constants/screens";
+import { fetchCoursesList, setCurrentCourse } from "../reducers/app.reducers";
+import { getCourses } from "../reducers/selectors";
+const { width } = Dimensions.get("screen");
 
 const CourseListScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const courses = useSelector(getCourses);
 
-  const onPress = item => {
+  const onPress = (item) => {
     dispatch(setCurrentCourse(item));
     navigation.navigate(screens.COURSE_DETAILS);
   };
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     return <CourseCard course={item} horizontal onPress={onPress} />;
   };
 
   useEffect(() => {
     dispatch(fetchCoursesList());
   }, []);
+
   return (
     <Block flex style={styles.container}>
       <FlatList
         scrollEnabled
         data={courses}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
         ListEmptyComponent={
           <Text style={styles.emptyList}>Nothing to Show here!</Text>
         }
@@ -47,11 +46,11 @@ const CourseListScreen = () => {
 
 const styles = StyleSheet.create({
   emptyList: {
-    padding: 20
+    padding: 20,
   },
   container: {
-    margin: 20
-  }
+    margin: 20,
+  },
 });
 
 export default CourseListScreen;
