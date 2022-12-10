@@ -5,26 +5,38 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { COLORS } from "../theme/colors";
 import { CommonFloatingInput } from "../components/CommonFloatingInput";
+import { ListItem } from "react-native-elements";
+import TouchableScale from "react-native-touchable-scale";
+import Lottie from "lottie-react-native";
+import { submitFeedback } from "../utils/api";
+import { useNavigation } from "@react-navigation/native";
 
 const FeedbackScreen = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [subject, setSubject] = useState("");
+  const [subjectError, setSubjectError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [feedbackError, setFeedbackError] = useState("");
 
   const emailRef = React.useRef(new Animated.Value(0)).current;
   const nameRef = React.useRef(new Animated.Value(0)).current;
-  const phoneRef = React.useRef(new Animated.Value(0)).current;
+  const subjectRef = React.useRef(new Animated.Value(0)).current;
   const feedbackRef = React.useRef(new Animated.Value(0)).current;
+  const navigation = useNavigation();
+  const animationRef = useRef();
+
+  useEffect(() => {
+    animationRef.current?.play();
+  }, []);
 
   const feedBackHandler = () => {
     Keyboard.dismiss();
@@ -40,8 +52,8 @@ const FeedbackScreen = () => {
       setNameError("Please enter name");
       nameError1 = "Please enter Password";
     }
-    if (phone?.length == 0) {
-      setPhoneError("Please enter phone number");
+    if (subject?.length == 0) {
+      setSubjectError("Please enter subject number");
       phoneError1 = "Please enter Password";
     }
     if (feedback?.length == 0) {
@@ -52,89 +64,118 @@ const FeedbackScreen = () => {
     if (
       email?.length !== 0 &&
       name?.length !== 0 &&
-      phone?.length !== 0 &&
+      subject?.length !== 0 &&
       feedback?.length !== 0
     ) {
-      Alert.alert("Success");
+      let dataToSend = {
+        name,
+        email,
+        subject,
+        feedback,
+      };
+      submitFeedback(dataToSend)
+        .then((res) => {
+          if (res.status === "mail_sent") {
+            navigation.goBack();
+          }
+        })
+        .catch((err) => {
+          Alert.alert(err.message);
+        });
     }
   };
 
   return (
-    <View style={{ padding: 16 }}>
-      <Text style={styles.loginText}>Add your feedback here!!</Text>
-      <CommonFloatingInput
-        labelText={"Name"}
-        moveText={nameRef}
-        inputStyle={{ color: COLORS.black }}
-        value={email}
-        onChangeText={(text) => {
-          setName(text);
-          setNameError("");
-        }}
-        errorText={nameError}
-        labelTextStyle={{ color: COLORS.gray500 }}
-        placeholder={""}
-        wrapperStyle={{ marginTop: 16 }}
-      />
-      <CommonFloatingInput
-        labelText={"Email"}
-        moveText={emailRef}
-        inputStyle={{ color: COLORS.black }}
-        value={email}
-        onChangeText={(text) => {
-          setEmail(text);
-          setEmailError("");
-        }}
-        keyboardType={"email-address"}
-        errorText={emailError}
-        labelTextStyle={{ color: COLORS.gray500 }}
-        placeholder={""}
-        wrapperStyle={{ marginTop: 16 }}
-      />
-      <CommonFloatingInput
-        labelText={"Phone"}
-        moveText={phoneRef}
-        inputStyle={{ color: COLORS.black }}
-        value={phone}
-        onChangeText={(text) => {
-          setPhone(text);
-          setPhoneError("");
-        }}
-        keyboardType={"number-pad"}
-        errorText={phoneError}
-        labelTextStyle={{ color: COLORS.gray500 }}
-        placeholder={""}
-        wrapperStyle={{ marginTop: 16 }}
-      />
-      <CommonFloatingInput
-        labelText={"Feedback"}
-        moveText={feedbackRef}
-        inputStyle={{ color: COLORS.black }}
-        value={feedback}
-        onChangeText={(text) => {
-          setFeedback(text);
-          setFeedbackError("");
-        }}
-        errorText={feedbackError}
-        labelTextStyle={{ color: COLORS.gray500 }}
-        placeholder={""}
-        wrapperStyle={{ marginTop: 16 }}
-      />
-      <TouchableOpacity
-        style={{
-          padding: 16,
-          backgroundColor: COLORS.one_01_coral,
-          alignSelf: "center",
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: 8,
-          marginTop: 16,
-        }}
-        onPress={feedBackHandler}
-      >
-        <Text style={{ color: COLORS.white }}>Send Feedback</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+      style={{ padding: 16 }}
+    >
+      <View style={{ flex: 1, padding: 16, backgroundColor: COLORS.white }}>
+        <Text style={styles.loginText}>Add your feedback here!!</Text>
+        <Lottie
+          ref={animationRef}
+          source={require("../assets/JSON/feedback.json")}
+          style={{ opacity: 0.7 }}
+        />
+        <View style={{ flex: 1 }}>
+          <CommonFloatingInput
+            labelText={"Name"}
+            moveText={nameRef}
+            inputStyle={{ color: COLORS.black, fontWeight: "600" }}
+            value={name}
+            onChangeText={(text) => {
+              setName(text);
+              setNameError("");
+            }}
+            errorText={nameError}
+            labelTextStyle={{ color: COLORS.gray500 }}
+            placeholder={""}
+            wrapperStyle={{ marginTop: 16 }}
+          />
+          <CommonFloatingInput
+            labelText={"Email"}
+            moveText={emailRef}
+            inputStyle={{ color: COLORS.black, fontWeight: "600" }}
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              setEmailError("");
+            }}
+            keyboardType={"email-address"}
+            errorText={emailError}
+            labelTextStyle={{ color: COLORS.gray500 }}
+            placeholder={""}
+            wrapperStyle={{ marginTop: 16 }}
+          />
+          <CommonFloatingInput
+            labelText={"Subject"}
+            moveText={subjectRef}
+            inputStyle={{ color: COLORS.black, fontWeight: "600" }}
+            value={subject}
+            onChangeText={(text) => {
+              setSubject(text);
+              setSubjectError("");
+            }}
+            errorText={subjectError}
+            labelTextStyle={{ color: COLORS.gray500 }}
+            placeholder={""}
+            wrapperStyle={{ marginTop: 16 }}
+          />
+          <CommonFloatingInput
+            labelText={"Feedback"}
+            moveText={feedbackRef}
+            inputStyle={{ color: COLORS.black, fontWeight: "600" }}
+            value={feedback}
+            onChangeText={(text) => {
+              setFeedback(text);
+              setFeedbackError("");
+            }}
+            errorText={feedbackError}
+            labelTextStyle={{ color: COLORS.gray500 }}
+            placeholder={""}
+            wrapperStyle={{ marginTop: 16 }}
+          />
+        </View>
+        <ListItem
+          Component={TouchableScale}
+          onPress={feedBackHandler}
+          style={{
+            margin: 16,
+            borderRadius: 10,
+            overflow: "hidden",
+          }}
+          containerStyle={{ backgroundColor: COLORS.one_01_coral }}
+        >
+          <ListItem.Content style={{ alignItems: "center" }}>
+            <ListItem.Title style={{ color: COLORS.white, fontWeight: "bold" }}>
+              Send Feedback
+            </ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

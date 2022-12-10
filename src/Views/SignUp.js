@@ -16,6 +16,8 @@ import { CommonFloatingInput } from "../components/CommonFloatingInput";
 import CommonButton from "../components/CommonButton";
 import { registerUser } from "../utils/api";
 import { screens } from "../constants/screens";
+import { ListItem } from "react-native-elements";
+import TouchableScale from "react-native-touchable-scale";
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -71,7 +73,6 @@ const SignUp = () => {
       };
       registerUser(createAccount)
         .then((res) => {
-          console.log("🚀 ~ file: SignUp.js ~ line 73 ~ .then ~ res", res);
           setLoading(false);
 
           if (res?.data?.registered) {
@@ -195,17 +196,29 @@ const SignUp = () => {
             wrapperStyle={{ marginTop: 16 }}
             placeholder={""}
           />
-
-          <CommonButton
-            onPress={() => {
-              handleCreateAccount();
-            }}
-            title="Sign Up"
-            isLoading={loading}
-            disable={loading}
-            wrapperStyle={styles.nextButton}
-            textStyle={[styles.colorWhite]}
-          />
+          <ListItem
+              Component={TouchableScale}
+              onPress={() => {
+                handleCreateAccount();
+              }}
+              style={{
+                marginTop:16,
+                borderRadius: 10,
+                overflow: "hidden",
+                marginHorizontal: 16,
+              }}
+              containerStyle={{ backgroundColor: COLORS.one_01_coral }}
+            >
+              <ListItem.Content
+                style={{ alignItems: "center", marginHorizontal: 16 }}
+              >
+                <ListItem.Title
+                  style={{ color: COLORS.white, fontWeight: "bold" }}
+                >
+                  Sign Up
+                </ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
         </View>
       </ScrollView>
     </TouchableOpacity>

@@ -1,6 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { default as React, useContext, useState } from "react";
 import {
+  default as React,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  Alert,
   Animated,
   Keyboard,
   StyleSheet,
@@ -15,6 +22,9 @@ import { setMyProfile } from "../reducers/app.reducers";
 import { COLORS } from "../theme/colors";
 import { loginApp, validateToken } from "../utils/api";
 import { AuthContext } from "../utils/AuthContext";
+import Lottie from "lottie-react-native";
+import { ListItem } from "react-native-elements";
+import TouchableScale from "react-native-touchable-scale";
 
 const Login = ({ navigation }) => {
   const { signIn } = useContext(AuthContext);
@@ -27,6 +37,11 @@ const Login = ({ navigation }) => {
 
   const emailRef = React.useRef(new Animated.Value(0)).current;
   const passwordRef = React.useRef(new Animated.Value(0)).current;
+  const animationRef = useRef();
+
+  useEffect(() => {
+    animationRef.current?.play();
+  }, []);
 
   const loginClickHandler = () => {
     Keyboard.dismiss();
@@ -46,12 +61,14 @@ const Login = ({ navigation }) => {
       let dataToSend = { username: email, password: password };
       loginApp(dataToSend)
         .then((res) => {
-          console.log("🚀 ~ file: Login.js ~ line 49 ~ .then ~ res", res);
           getDetailsAndNavigate(res);
           setLoader(false);
+          setEmail("");
+          setPassword("");
+          setEmailError("");
+          setPasswordError("");
         })
         .catch((e) => {
-          console.log("e", e.message);
           setLoader(false);
           let message = "";
           if (e.message.includes("404") || e.message.includes("403")) {
@@ -67,15 +84,12 @@ const Login = ({ navigation }) => {
   const getDetailsAndNavigate = (res) => {
     validateToken(res.token)
       .then((result) => {
-        console.log("🚀 ~ file: Login.js ~ line 69 ~ .then ~ res", res);
         if (result.id) {
-          signIn(res.token, res);
-          dispatch(setMyProfile(result));
+          signIn(res.token, res, result);
+          dispatch(setMyProfile(res));
         }
       })
-      .catch((err) => {
-        // navigation.navigate("Settings");
-      });
+      .catch((err) => {});
   };
 
   return (
@@ -88,6 +102,11 @@ const Login = ({ navigation }) => {
     >
       <View style={styles.container}>
         <View style={styles.mainView}>
+          <Lottie
+            ref={animationRef}
+            source={require("../assets/JSON/login.json")}
+            style={{ opacity: 0.5 }}
+          />
           <View style={styles.spaceTop20}>
             <Text style={[styles.loginText]}>Login</Text>
           </View>
@@ -96,11 +115,12 @@ const Login = ({ navigation }) => {
               <CommonFloatingInput
                 labelText={"Email"}
                 moveText={emailRef}
-                inputStyle={{ color: COLORS.black }}
+                inputStyle={{ color: COLORS.black, fontWeight: "600" }}
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
                   setEmailError("");
+                  setInvalidCredential("");
                 }}
                 errorText={emailError}
                 labelTextStyle={{ color: COLORS.gray500 }}
@@ -112,7 +132,7 @@ const Login = ({ navigation }) => {
               <CommonFloatingInput
                 labelText={"Password"}
                 moveText={passwordRef}
-                inputStyle={{ color: COLORS.black }}
+                inputStyle={{ color: COLORS.black, fontWeight: "600" }}
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
@@ -147,20 +167,40 @@ const Login = ({ navigation }) => {
             </TouchableOpacity>
           )}
           <View style={styles.spacemargin24}>
-            <CommonButton
-              title="Login"
-              textStyle={[{ color: COLORS.white }]}
+            <ListItem
+              Component={TouchableScale}
               onPress={() => {
                 loginClickHandler();
               }}
-              isLoading={loader}
-            />
+              style={{
+                borderRadius: 10,
+                overflow: "hidden",
+                marginHorizontal: 16,
+              }}
+              containerStyle={{ backgroundColor: COLORS.one_01_coral }}
+            >
+              <ListItem.Content
+                style={{ alignItems: "center", marginHorizontal: 16 }}
+              >
+                <ListItem.Title
+                  style={{ color: COLORS.white, fontWeight: "bold" }}
+                >
+                  Login
+                </ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
           </View>
           <View style={styles.createAccount}>
             <Text style={[styles.createAccountText]}>
               Don't have an account?{" "}
               <Text
-                onPress={() => navigation.navigate(screens.SIGNUP)}
+                onPress={() => {
+                  navigation.navigate(screens.SIGNUP);
+                  setEmail("");
+                  setPassword("");
+                  setEmailError("");
+                  setPasswordError("");
+                }}
                 style={{ color: COLORS.one_01_coral, fontWeight: "600" }}
               >
                 Register here

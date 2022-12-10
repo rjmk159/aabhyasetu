@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 
 import {
   FlatList,
@@ -20,16 +20,16 @@ import {
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSubjects, setSelectedSubject } from "../reducers/app.reducers";
-import { getSubjectsList } from "../reducers/selectors";
 import { useNavigation } from "@react-navigation/native";
 import { ListItem } from "@rneui/themed";
 import TouchableScale from "react-native-touchable-scale"; // https://github.com/kohver/react-native-touchable-scale
-import LinearGradient from "react-native-linear-gradient"; // Only if no expo
 import { screens } from "../constants/screens";
+import { COLORS } from "../theme/colors";
+import { AuthContext } from "../utils/AuthContext";
 
 const SettingsScreen = () => {
   const isDarkMode = useColorScheme() === "dark";
+  const { signOut } = useContext(AuthContext);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
@@ -93,6 +93,26 @@ const SettingsScreen = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item.name}
         />
+        <ListItem
+          Component={TouchableScale}
+          onPress={() => {
+            signOut();
+          }}
+          style={{
+            borderRadius: 10,
+            overflow: "hidden",
+            marginHorizontal: 16,
+          }}
+          containerStyle={{ backgroundColor: COLORS.one_01_coral }}
+        >
+          <ListItem.Content
+            style={{ alignItems: "center", marginHorizontal: 16 }}
+          >
+            <ListItem.Title style={{ color: COLORS.white, fontWeight: "bold" }}>
+              Log out
+            </ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
       </View>
     </SafeAreaProvider>
   );

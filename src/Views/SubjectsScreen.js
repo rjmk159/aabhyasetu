@@ -33,10 +33,6 @@ const SubjectsScreen = () => {
   const dispatch = useDispatch();
   const subjects = useSelector(getSubjectsList);
   const Focus = useIsFocused();
-  console.log(
-    "🚀 ~ file: SubjectsScreen.js ~ line 35 ~ SubjectsScreen ~ subjects",
-    subjects
-  );
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -80,6 +76,7 @@ const SubjectsScreen = () => {
       </ListItem>
     );
   };
+
   return (
     <SafeAreaProvider style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
@@ -93,6 +90,7 @@ const SubjectsScreen = () => {
           scrollEnabled
           data={subjects}
           renderItem={renderItem}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={
             <Text style={styles.emptyList}>Nothing to Show here!</Text>

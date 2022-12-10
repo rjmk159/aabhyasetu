@@ -48,7 +48,6 @@ const { actions, reducer } = createSlice({
       state.currentLesson = payload;
     },
     setGrade: (state, { payload }) => {
-      console.log("sdafasd", payload);
       state.gradeSelected = payload;
     },
     setLanguage: (state, { payload }) => {
@@ -92,10 +91,6 @@ export default reducer;
 export const fetchSubjects = () => async (dispatch) => {
   try {
     const res = await getCoursesCategories();
-    console.log(
-      "🚀 ~ file: app.reducers.js ~ line 94 ~ fetchSubjects ~ res",
-      res
-    );
     dispatch(setSubjects(res.data));
     return true;
   } catch (error) {
@@ -106,8 +101,10 @@ export const fetchCoursesList = () => async (dispatch, getState) => {
   try {
     const state = getState();
     const subId = getSelectedSubjected(state);
+    dispatch(setIsLoading(true));
     const res = await getCoursesListBasedOnSub(subId);
     dispatch(setCourses(res));
+    dispatch(setIsLoading(false));
     return true;
   } catch (error) {
     return true;
@@ -117,8 +114,10 @@ export const fetchCoursesList = () => async (dispatch, getState) => {
 export const fetchLessonsBasedOnCurrentCourse =
   (courseId) => async (dispatch) => {
     try {
+      dispatch(setIsLoading(true));
       const res = await getLessonsById(courseId);
       dispatch(setLesson(res));
+      dispatch(setIsLoading(false));
       return true;
     } catch (error) {
       return true;

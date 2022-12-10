@@ -27,10 +27,6 @@ const App = () => {
       }
     });
     AsyncStorage.getItem("userDetails").then((res) => {
-      console.log(
-        "🚀 ~ file: App.js ~ line 30 ~ AsyncStorage.getItem ~ res",
-        res
-      );
       if (res) {
         dispatch(setMyProfile(JSON.parse(res)));
       }
@@ -41,16 +37,20 @@ const App = () => {
 
   const globleContextValue = React.useMemo(() => {
     return {
-      signIn: (token, res) => {
+      signIn: (token, res, result) => {
         setUserToken(token);
-        dispatch(setMyProfile(res));
+        let userData = {
+          res: res,
+          result: result,
+        };
+        dispatch(setMyProfile(userData));
         AsyncStorage.setItem("token", JSON.stringify(token));
-        AsyncStorage.setItem("userDetails", JSON.stringify(res));
+        AsyncStorage.setItem("userDetails", JSON.stringify(userData));
       },
       signOut: () => {
         setUserToken("");
-        setUserInfo({});
         AsyncStorage.setItem("token", "");
+        AsyncStorage.setItem("userDetails", "");
       },
     };
   }, [userToken]);

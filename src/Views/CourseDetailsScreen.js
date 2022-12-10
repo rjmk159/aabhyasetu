@@ -35,7 +35,6 @@ const CourseDetails = ({ navigation }) => {
   if (course && course.length) {
     course = course[0];
   }
-  console.log("course-->", course);
   const contentWidth = useWindowDimensions().width;
 
   const handleOpenLesson = (item) => {

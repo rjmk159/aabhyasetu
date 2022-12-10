@@ -23,6 +23,5 @@ export const _removeData = async () => {
   try {
     await AsyncStorage.removeItem('LOGIN_JWT_CREDS');
   } catch (error) {
-    console.log(error);
   }
 };
