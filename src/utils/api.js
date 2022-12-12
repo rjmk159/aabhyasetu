@@ -21,9 +21,11 @@ export const loginApp = (dataToSend) => {
     axios
       .post(BASE_URL_AUTH, dataToSend)
       .then((response) => {
+        console.log(response.data)
         resolve(response.data);
       })
       .catch((error) => {
+        console.log(error)
         reject(error);
       });
   });

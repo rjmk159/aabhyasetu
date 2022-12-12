@@ -102,11 +102,13 @@ const Login = ({ navigation }) => {
     >
       <View style={styles.container}>
         <View style={styles.mainView}>
+          <View style={{flex:0.4, height: 50, overflow: "hidden"}}>
           <Lottie
             ref={animationRef}
             source={require("../assets/JSON/login.json")}
             style={{ opacity: 0.5 }}
           />
+          </View>
           <View style={styles.spaceTop20}>
             <Text style={[styles.loginText]}>Login</Text>
           </View>
@@ -219,6 +221,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
+    marginTop: 40
   },
   mainContainer: {
     flexGrow: 1,
@@ -260,6 +263,7 @@ export const styles = StyleSheet.create({
   },
   createAccount: {
     alignSelf: "center",
+    marginTop: 12
   },
   createAccountText: {
     textDecorationLine: "underline",

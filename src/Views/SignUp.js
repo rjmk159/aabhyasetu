@@ -219,6 +219,23 @@ const SignUp = () => {
                 </ListItem.Title>
               </ListItem.Content>
             </ListItem>
+            <View style={styles.createAccount}>
+            <Text style={[styles.createAccountText]}>
+              Already have an account?{" "}
+              <Text
+                onPress={() => {
+                  navigation.navigate(screens.LOGIN);
+                  setEmail("");
+                  setPassword("");
+                  setEmailError("");
+                  setPasswordError("");
+                }}
+                style={{ color: COLORS.one_01_coral, fontWeight: "600" }}
+              >
+               Login
+              </Text>
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </TouchableOpacity>
@@ -229,7 +246,7 @@ export default SignUp;
 
 const styles = StyleSheet.create({
   mainWrapper: { backgroundColor: COLORS.white, flex: 1 },
-  container: { padding: 16, backgroundColor: COLORS.white },
+  container: { padding: 16, backgroundColor: COLORS.white,  marginTop: 40 },
   stepWrapper: { marginTop: 15, alignItems: "center" },
   stepImage: { height: 50, width: 50 },
   stepContainer: { marginLeft: 16 },
@@ -247,4 +264,11 @@ const styles = StyleSheet.create({
   colorWhite: { color: COLORS.white, fontSize: 16 },
   nextButton: { marginTop: 32, flex: 1 },
   separater: { width: 15 },
+  createAccount: {
+    alignSelf: "center",
+    marginTop: 12
+  },
+  createAccountText: {
+    textDecorationLine: "underline",
+  },
 });

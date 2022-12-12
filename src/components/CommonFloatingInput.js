@@ -140,7 +140,8 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     fontSize: 17,
-    //fontWeight:'400%',
+    //fontWeight:'400%'
+    minHeight: 50,
     color: COLORS.gray500,
     flex: 1,
     top: 10,
