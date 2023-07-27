@@ -1,14 +1,14 @@
-import axios from 'axios';
-import {checkAUTH} from '../utils/helper';
+import axios from "axios";
+import { checkAUTH } from "../utils/helper";
 
 // export const BASE_URL = 'https://kitchenitems.click/learning';
-export const BASE_URL = 'http://abhyasetu.in';
+export const BASE_URL = "https://abhyasetu.in";
 
 const getAuthorization = async () => {
   const LOGIN_TOKEN = await checkAUTH();
   if (LOGIN_TOKEN) {
     return {
-      headers: {Authorization: `Bearer ${LOGIN_TOKEN}`},
+      headers: { Authorization: `Bearer ${LOGIN_TOKEN}` },
     };
   }
 };
@@ -16,20 +16,21 @@ const getAuthorization = async () => {
 export const BASE_URL_JSON = `${BASE_URL}/wp-json/wp/v2`;
 export const BASE_URL_AUTH = `${BASE_URL}/wp-json/jwt-auth/v1/token`;
 
-export const loginApp = dataToSend => {
+export const loginApp = (dataToSend) => {
   return new Promise((resolve, reject) => {
     axios
       .post(BASE_URL_AUTH, dataToSend)
-      .then(response => {
+      .then((response) => {
+        console.log(response.data)
         resolve(response.data);
       })
-      .catch(error => {
-        console.log(error.message);
+      .catch((error) => {
+        console.log(error)
         reject(error);
       });
   });
 };
-export const validateToken = JWT => {
+export const validateToken = (JWT) => {
   return new Promise((resolve, reject) => {
     axios
       .get(`${BASE_URL_JSON}/users/me`, {
@@ -37,10 +38,10 @@ export const validateToken = JWT => {
           Authorization: `Bearer ${JWT}`,
         },
       })
-      .then(response => {
+      .then((response) => {
         resolve(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
         error;
       });
@@ -63,16 +64,16 @@ export const registerUser = ({
         firstname: firstName,
         lastname: lastName,
       })
-      .then(response => {
+      .then((response) => {
         resolve(response);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });
 };
 
-export const updateUserMeta = ({standard, language, ID}) => {
+export const updateUserMeta = ({ standard, language, ID }) => {
   return new Promise((resolve, reject) => {
     axios
       .post(`${BASE_URL}/wp-json/update_user/config`, {
@@ -80,74 +81,93 @@ export const updateUserMeta = ({standard, language, ID}) => {
         language,
         ID,
       })
-      .then(response => {
+      .then((response) => {
         resolve(response);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });
 };
 
-export const getCoursesListBasedOnSub = subId => {
+export const getCoursesListBasedOnSub = (subId) => {
   return new Promise((resolve, reject) => {
     axios
       .get(`${BASE_URL_JSON}/sfwd-courses?categories=${subId}&per_page=100`)
-      .then(response => {
+      .then((response) => {
         resolve(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });
 };
 export const getCoursesCategories = () => {
-  console.log(`${BASE_URL_JSON}/categories?per_page=100`);
   return new Promise((resolve, reject) => {
     axios
       .get(`${BASE_URL_JSON}/categories?per_page=100`)
-      .then(response => {
-        console.log(response);
+      .then((response) => {
         resolve(response);
       })
-      .catch(error => {
-        console.log(error);
+      .catch((error) => {
         reject(error);
       });
   });
 };
-export const getLessonsById = async id => {
+export const getLessonsById = async (id) => {
   const config = await getAuthorization();
   return new Promise((resolve, reject) => {
     axios
       .get(`${BASE_URL}/wp-json/ldlms/v2/sfwd-lessons/?course=${id}`, config)
-      .then(response => {
+      .then((response) => {
         resolve(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });
 };
 
-export const submitFeedback = data => {
+export const submitFeedback = (data) => {
   return new Promise((resolve, reject) => {
     let formdata = new FormData();
 
-    formdata.append('your-name', data.name);
-    formdata.append('your-email', data.email);
-    formdata.append('your-subject', data.subject);
-    formdata.append('your-message', data.message);
+    formdata.append("your-name", data.name);
+    formdata.append("your-email", data.email);
+    formdata.append("your-subject", data.subject);
+    formdata.append("your-message", data.feedback);
     axios
       .post(
         `${BASE_URL}/wp-json/contact-form-7/v1/contact-forms/27738/feedback`,
-        formdata,
+        JSON.stringify(formdata)
       )
-      .then(response => {
+      .then((response) => {
         resolve(response);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
+      });
+  });
+};
+
+export const editProfileHandler = (data) => {
+  console.log("data", data);
+  return new Promise((resolve, reject) => {
+    let formdata = new FormData();
+
+    formdata.append("name", data.name);
+    formdata.append("email", data.email);
+    // formdata.append("description", data.description);
+    axios
+      .post(
+        `${BASE_URL}/wp-json/wp/v2/users/${data?.id}`,
+        JSON.stringify(formdata)
+      )
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((err) => {
+        reject(err);
       });
   });
 };

@@ -5,7 +5,7 @@ import {
   Image,
   View,
   Text,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Block, theme} from 'galio-framework';
@@ -30,7 +30,7 @@ const CourseCard = ({
   ];
 
   return (
-    <TouchableScale
+    <TouchableOpacity
       disabled={disabled}
       style={[
         styles.product,
@@ -59,7 +59,7 @@ const CourseCard = ({
           {course?.course_price ? `Price: ${course?.course_price}` : 'Free'}
         </Text>
       </Block>
-    </TouchableScale>
+    </TouchableOpacity>
   );
 };
 
