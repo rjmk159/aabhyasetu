@@ -42,15 +42,15 @@ const MyProfileScreen = () => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  const handlePress = id => {
-    dispatch(setSelectedSubject(id));
+  const handlePress = item => {
+    dispatch(setSelectedSubject(item));
     navigation.navigate(screens.COURSE_LIST);
   };
   const renderItem = ({item}) => {
     return (
       <ListItem
         Component={TouchableScale}
-        onPress={() => handlePress(item.id)}
+        onPress={() => handlePress(item)}
         style={styles.listItem}
         friction={90}
         bottomDivider

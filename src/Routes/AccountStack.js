@@ -15,31 +15,33 @@ import CommingSoon from "../Views/CommingSoon";
 import ProfileView from "../Views/ProfileView";
 import EditProfile from "../Views/EditProfile";
 import FeedbackScreen from "../Views/FeedbackScreen";
+import SubjectsScreen from "../Views/SubjectsScreen";
 
 const Stack = createNativeStackNavigator();
 
 const stackoptions = ({ navigation }) => ({
   headerBackTitleVisible: true,
   headerStyle: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#F44336',
   },
-  headerTintColor: "#14091B",
+  headerTintColor: '#FFF',
+  headerTitleAlign: 'center',
+  headerTitleStyle: { fontSize: 16 },
   headerLeft: () => {
     return (
       <TouchableOpacity
         onPress={() => {
           navigation.goBack();
-        }}
-      >
+        }}>
         <View
-          style={{ justifyContent: "center", alignItems: "center", margin: 0 }}
-        >
-          <Ionicons name={"arrow-back-outline"} size={28} color={"#F44336"} />
+          style={{justifyContent: 'center', alignItems: 'center', margin:0}}>
+          <Ionicons name={'arrow-back-outline'} size={24} color={'#FFF'} />
         </View>
       </TouchableOpacity>
     );
   },
 });
+
 
 const HomeStack = () => {
   return (
@@ -69,65 +71,18 @@ const HomeStack = () => {
         component={EditProfile}
       />
       <Stack.Screen
+        name={screens.SUBJECT_LIST}
+        options={{title: 'Select Subject', headerShown: false}}
+        component={SubjectsScreen}
+      />
+      <Stack.Screen
         name={screens.FEEDBACK}
         options={{ title: "Feedback" }}
         component={FeedbackScreen}
       />
 
-      {/*
-			<Stack.Screen
-				name="Verification"
-				options={{ headerShown: false }}
-				component={VerificationScreen}
-			/>
-			<Stack.Screen
-				name="Address"
-				options={{ headerShown: false }}
-				component={AddressesScreen}
-			/>
-			<Stack.Screen
-				name="Edit Profile"
-				title="Edit Profile"
-				options={{ headerShown: true, title: "Edit Profile" }}
-				component={EditProfileScreen}
-			/>
-			<Stack.Screen
-				name="CouponDetail"
-				options={{ title: "Promotions / Coupons" }}
-				component={CouponDetailScreen}
-			/>
-			<Stack.Screen
-				name="Search"
-				options={{ title: "Search", headerShown: false }}
-				component={SearchProductScreen}
-			/>
-			<Stack.Screen
-				name="Create Address"
-				options={{ title: "Add New Address" }}
-				component={CreateAddressScreen}
-			/>
-			<Stack.Screen
-				name="ProductDetail"
-				options={({ route }) => ({ title: route.params.produtTitle })}
-				component={ProductDetailScreen}
-			/>
 
-			<Stack.Screen
-				name="StoreDetail"
-				options={({ route }) => ({ title: route.params.storeTitle })}
-				component={StoreDetailScreen}
-			/>
 
-			<Stack.Screen
-				name="Category"
-				options={({ route }) => ({ headerTitle: route.params.categoryName })}
-				component={CategoryScreen}
-			/>
-			<Stack.Screen
-				name="PetTypeCategory"
-				options={({ route }) => ({ title: route.params.categoryName })}
-				component={PetTypeCategoryScreen}
-			/> */}
     </Stack.Navigator>
   );
 };

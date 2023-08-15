@@ -21,11 +21,9 @@ export const loginApp = (dataToSend) => {
     axios
       .post(BASE_URL_AUTH, dataToSend)
       .then((response) => {
-        console.log(response.data)
         resolve(response.data);
       })
       .catch((error) => {
-        console.log(error)
         reject(error);
       });
   });
@@ -43,7 +41,6 @@ export const validateToken = (JWT) => {
       })
       .catch((error) => {
         reject(error);
-        error;
       });
   });
 };
@@ -73,27 +70,29 @@ export const registerUser = ({
   });
 };
 
-export const updateUserMeta = ({ standard, language, ID }) => {
+export const updateUserMeta = (data, jwt) => {
   return new Promise((resolve, reject) => {
     axios
-      .post(`${BASE_URL}/wp-json/update_user/config`, {
-        class: standard,
-        language,
-        ID,
+      .post(`${BASE_URL}/wp-json/update/metadata`, data, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
       })
       .then((response) => {
+        console.log(response.data);
         resolve(response);
       })
       .catch((error) => {
+        console.log(error);
         reject(error);
       });
   });
 };
 
-export const getCoursesListBasedOnSub = (subId) => {
+export const getCoursesListBasedOnSub = (subId, page) => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${BASE_URL_JSON}/sfwd-courses?categories=${subId}&per_page=100`)
+      .get(`${BASE_URL_JSON}/sfwd-courses?categories=${subId}&page=${page}&orderby=date`)
       .then((response) => {
         resolve(response.data);
       })
@@ -150,23 +149,43 @@ export const submitFeedback = (data) => {
   });
 };
 
-export const editProfileHandler = (data) => {
-  console.log("data", data);
+export const editProfileHandler = (data, jwt) => {
   return new Promise((resolve, reject) => {
-    let formdata = new FormData();
-
-    formdata.append("name", data.name);
-    formdata.append("email", data.email);
-    // formdata.append("description", data.description);
     axios
       .post(
-        `${BASE_URL}/wp-json/wp/v2/users/${data?.id}`,
-        JSON.stringify(formdata)
+        `${BASE_URL}/wp-json/update/subscriber`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
       )
       .then((res) => {
-        resolve(res);
+        resolve(res.data);
       })
       .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const deleteProfileHandler = (data, jwt) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+    data : {...data}
+  };
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(`${BASE_URL}/wp-json/delete/subscriber`, config)
+      .then((res) => {
+        console.log(res)
+        resolve(res.data);
+      })
+      .catch((err) => {
+        console.log(err)
         reject(err);
       });
   });

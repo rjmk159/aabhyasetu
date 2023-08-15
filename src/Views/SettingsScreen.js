@@ -25,7 +25,10 @@ import { Block, Button, Text, theme } from "galio-framework";
 import TouchableScale from "react-native-touchable-scale";
 import { materialTheme } from "../constants";
 import { COLORS } from "../theme/colors";
-import { getSelectedGrade, getSelectedLanguage } from "../reducers/selectors";
+import { getProfileAuth, getProfileDetails, getProfileSettings } from "../reducers/selectors";
+import { screens } from "../constants/screens";
+import { ActivityIndicator } from "react-native";
+import { updateUserMeta } from "../utils/api";
 
 const languagesList = [
   { title: "english", id: "language", type: "switch" },
@@ -33,8 +36,8 @@ const languagesList = [
 ];
 
 const gradesList = [
-  { title: "11", id: "grade", type: "switch" },
-  { title: "12", id: "grade", type: "switch" },
+  { title: "11", id: "class", type: "switch" },
+  { title: "12", id: "class", type: "switch" },
 ];
 
 const mapToString = {
@@ -46,39 +49,53 @@ const mapToString = {
 const SettingsScreen = () => {
   const isDarkMode = useColorScheme() === "dark";
 
-  const grade = useSelector(getSelectedGrade);
-  const language = useSelector(getSelectedLanguage);
-  const [lngState, setStateLanguage] = useState(language);
-  const [gradeState, setStateGrade] = useState(grade);
+  const settings = useSelector(getProfileSettings);
+  const profileDetails = useSelector(getProfileDetails);
+  const profileAuth = useSelector(getProfileAuth);
+
+  const [flag, setFlag] = useState(false);
+  const [lngState, setStateLanguage] = useState(settings.language);
+  const [gradeState, setStateGrade] = useState(settings.class);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
   const handlePress = (type, title) => {
-    // dispatch(setSelectedSubject(id));
-    // navigation.navigate(screens.COURSE_LIST);
     if (type === "language") {
       setStateLanguage(title);
-      dispatch(setLanguage(title));
     } else {
       setStateGrade(title);
-      dispatch(setGrade(title));
     }
   };
 
-  // const getDetailsAndNavigate = async () => {
-  //   const lng = 'english';
-  //   const grd = '11';
-  //   setStateLanguage(lng);
-  //   setStateGrade(grd);
-  // };
-  useEffect(() => {
-    // getDetailsAndNavigate();
-  }, []);
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    const data = {
+      class: gradeState,
+      language: lngState,
+      ID: Number(profileDetails.id)
+    }
+    try {
+      await updateUserMeta(data, profileAuth.token);
+      setIsLoading(false);
 
+      dispatch(setGrade(data.class));
+      dispatch(setLanguage(data.language));
+
+      navigation.navigate(screens.SUBJECT_LIST);
+    } catch (error) {
+      setIsLoading(false);
+      // reverting values if not updated
+      setStateGrade(settings.class);
+      setStateLanguage(settings.language)
+    }
+
+  }
   return (
     <ScrollView
       contentContainerStyle={{ paddingBottom: 30 }}
       showsVerticalScrollIndicator={false}
+      key={flag}
     >
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
 
@@ -111,7 +128,7 @@ const SettingsScreen = () => {
                   : "ellipse-outline"
               }
               size={28}
-              color={COLORS.one_01_coral}
+              color={COLORS.primary}
             />
           </ListItem>
         );
@@ -145,7 +162,7 @@ const SettingsScreen = () => {
                   : "ellipse-outline"
               }
               size={28}
-              color={COLORS.one_01_coral}
+              color={COLORS.primary}
             />
           </ListItem>
         );
@@ -153,13 +170,14 @@ const SettingsScreen = () => {
       <Block center>
         <Button
           shadowless
-          color={COLORS.one_01_coral}
-          onPress={() => {
-            navigation.goBack();
-          }}
+          color={COLORS.primary}
+          onPress={
+            handleSubmit
+
+          }
         >
           <Text size={14} color={materialTheme.COLORS.WHITE}>
-            Submit
+            {isLoading ? <ActivityIndicator color={'#fff'} /> : 'Submit'}
           </Text>
         </Button>
       </Block>

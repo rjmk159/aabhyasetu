@@ -19,7 +19,7 @@ import CourseCard from "../components/cards";
 
 const { width } = Dimensions.get("screen");
 import { materialTheme } from "../constants";
-import { getCourseDetails, getCourseLessons } from "../reducers/selectors";
+import { getCourseLessons, getSelectedCourse } from "../reducers/selectors";
 import {
   fetchLessonsBasedOnCurrentCourse,
   setCurrentLesson,
@@ -28,7 +28,7 @@ import { screens } from "../constants/screens";
 
 const CourseDetails = ({ navigation }) => {
   const dispatch = useDispatch();
-  let course = useSelector(getCourseDetails);
+  let course = useSelector(getSelectedCourse);
   let lessons = useSelector(getCourseLessons);
   const [selectedTab, setSelectedTab] = useState(0);
 

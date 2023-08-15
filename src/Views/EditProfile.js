@@ -1,8 +1,8 @@
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Animated, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { COLORS } from "../theme/colors";
-import { useSelector } from "react-redux";
-import { getProfile } from "../reducers/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { getProfile, getProfileAuth, getProfileDetails } from "../reducers/selectors";
 import { CommonFloatingInput } from "../components/CommonFloatingInput";
 import Lottie from "lottie-react-native";
 import { ListItem } from "react-native-elements";
@@ -10,53 +10,57 @@ import TouchableScale from "react-native-touchable-scale";
 import { editProfileHandler } from "../utils/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { setProfileDetails } from "../reducers/app.reducers";
 
 const EditProfile = () => {
-  const profileDetails = useSelector(getProfile);
-  const [email, setEmail] = useState(profileDetails?.res?.user_email);
+  const profileDetails = useSelector(getProfileDetails);
+  const profileAuth = useSelector(getProfileAuth);
+  const [email, setEmail] = useState(profileDetails.email);
   const [emailError, setEmailError] = useState("");
-  const [name, setName] = useState(profileDetails?.res?.user_display_name);
-  const [nameError, setNameError] = useState("");
-  const [description, setDescription] = useState(
-    profileDetails?.result?.description
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [firstName, setFirstName] = useState(
+    profileDetails?.firstName
   );
+  const [firstNameError, setFirstNameError] = useState("");
+  const [lastName, setLastname] = useState(
+    profileDetails?.lastName
+  );
+  const [lastNameError, setLastNameError] = useState("");
 
   const emailRef = React.useRef(new Animated.Value(0)).current;
-  const nameRef = React.useRef(new Animated.Value(0)).current;
-  const descriptionRef = React.useRef(new Animated.Value(0)).current;
+  const lastNameRef = React.useRef(new Animated.Value(0)).current;
+  const firstNameRed = React.useRef(new Animated.Value(0)).current;
   const animationRef = useRef();
+  const dispatch =  useDispatch();
 
   useEffect(() => {
     animationRef.current?.play();
   }, []);
 
   const editProfile = async () => {
+    if(isLoading) return;
     let dataToSend = {
       email,
-      name,
-      description,
-      id: profileDetails?.result?.id,
+      // name,
+      firstname: firstName,
+      lastname: lastName,
+      id: profileDetails?.id,
     };
-
-    editProfileHandler(dataToSend)
+    setIsLoading(true);
+    editProfileHandler(dataToSend, profileAuth.token)
       .then((res) => {
-        console.log("asda", JSON.stringify(res));
+        console.log(res);
+        dispatch(setProfileDetails(res.details))
+        setIsLoading(false);
       })
       .catch((err) => {
-        console.log("err", JSON.stringify(err));
+        setIsLoading(false);
       });
   };
 
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: COLORS.white }}>
-      <Lottie
-        source={require("../assets/JSON/card.json")}
-        ref={animationRef}
-        style={{
-          opacity: 0.5,
-          marginHorizontal: 24,
-        }}
-      />
       <View style={{ flex: 1 }}>
         <View style={styles.wrapper}>
           <Text style={styles.heading}>Email:</Text>
@@ -74,8 +78,8 @@ const EditProfile = () => {
             placeholder={""}
           />
         </View>
-        <View style={styles.wrapper}>
-          <Text style={styles.heading}>Name:</Text>
+        {/* <View style={styles.wrapper}>
+          <Text style={styles.heading}>Display Name:</Text>
           <CommonFloatingInput
             labelText={"Name"}
             moveText={nameRef}
@@ -89,36 +93,53 @@ const EditProfile = () => {
             labelTextStyle={{ color: COLORS.gray500 }}
             placeholder={""}
           />
-        </View>
+        </View> */}
         <View style={styles.wrapper}>
-          <Text style={styles.heading}>Description:</Text>
+          <Text style={styles.heading}>First Name:</Text>
           <CommonFloatingInput
-            labelText={"Description"}
-            moveText={descriptionRef}
+            labelText={"First Name"}
+            moveText={firstNameRed}
             inputStyle={{ color: COLORS.black, fontWeight: "600" }}
-            value={description}
+            value={firstName}
             onChangeText={(text) => {
-              setDescription(text);
+              setFirstName(text);
+              setFirstNameError("");
             }}
-            errorText={""}
+            errorText={firstNameError}
             labelTextStyle={{ color: COLORS.gray500 }}
             placeholder={""}
           />
         </View>
         <View style={styles.wrapper}>
-          <Text style={styles.heading}>Username:</Text>
+          <Text style={styles.heading}>Last Name:</Text>
+          <CommonFloatingInput
+            labelText={"Last Name"}
+            moveText={lastNameRef}
+            inputStyle={{ color: COLORS.black, fontWeight: "600" }}
+            value={lastName}
+            onChangeText={(text) => {
+              setLastname(text);
+              setLastNameError("")
+            }}
+            errorText={lastNameError}
+            labelTextStyle={{ color: COLORS.gray500 }}
+            placeholder={""}
+          />
+        </View>
+        {/* <View style={styles.wrapper}>
+          <Text style={styles.heading}>desc:</Text>
           <CommonFloatingInput
             labelText={"UserName"}
             moveText={emailRef}
             inputStyle={{ color: COLORS.black, fontWeight: "600" }}
-            value={profileDetails?.res?.user_nicename}
-            onChangeText={(text) => {}}
+            value={profileDetails?.name}
+            onChangeText={(text) => { }}
             errorText={emailError}
             editable={false}
             labelTextStyle={{ color: COLORS.gray500 }}
             placeholder={""}
           />
-        </View>
+        </View> */}
       </View>
       <ListItem
         Component={TouchableScale}
@@ -130,13 +151,13 @@ const EditProfile = () => {
           overflow: "hidden",
           marginHorizontal: 16,
         }}
-        containerStyle={{ backgroundColor: COLORS.one_01_coral }}
+        containerStyle={{ backgroundColor: COLORS.primary }}
       >
         <ListItem.Content
           style={{ alignItems: "center", marginHorizontal: 16 }}
         >
           <ListItem.Title style={{ color: COLORS.white, fontWeight: "bold" }}>
-            Save
+            {isLoading ? <ActivityIndicator color={"#fff"} /> : 'Update'}
           </ListItem.Title>
         </ListItem.Content>
       </ListItem>
@@ -151,7 +172,7 @@ const styles = StyleSheet.create({
   heading: {
     fontWeight: "600",
     fontSize: 16,
-    color: COLORS.one_01_coral,
+    color: COLORS.primary,
     marginBottom: 8,
   },
   text: { marginTop: 8, fontSize: 20, color: COLORS.black },

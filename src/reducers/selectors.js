@@ -1,20 +1,21 @@
-export const getSubjectsList = (state) => {
-  let selectedGrade = state.app?.gradeSelected;
-  return state.app?.subjects?.filter(
-    (value) => value.name.includes(`-${selectedGrade}`) && value
+export const getSubjectList = (state) => {
+  let grade = state.app?.profile.settings.class;
+  return state.app?.subject.list?.filter(
+    (value) => value.name.includes(`-${grade ?? '11'}`) && value
   );
 };
+export const getSelectedSubject = (state) => state.app.subject.selected;
 
-export const getCourses = (state) => state.app.courses;
+export const getCoursesList = (state) => state.app.course.list;
+export const getSelectedCourse = (state) => state.app.course.selected;
+export const getCoursePage = (state) => state.app.course.page;
 
-export const getCourseDetails = (state) => state.app.currentCourse;
+export const getCourseLessons = (state) => state.app.lesson.list;
+export const getSelectedLession = (state) => state.app.lesson.selected;
 
-export const getCourseLessons = (state) => state.app.lessons;
 
-export const getLessonDetails = (state) => state.app.currentLesson;
+export const getProfileDetails = (state) => state.app.profile.details;
+export const getProfileAuth = (state) => state.app.profile.auth;
+export const getProfileSettings = (state) => state.app.profile.settings;
 
-export const getSelectedSubjected = (state) => state.app.subjectSelected;
-export const getProfile = (state) => state.app.myProfile;
-export const getIsLoading = (state) => state.app.isLoading;
-export const getSelectedGrade = (state) => state.app.gradeSelected;
-export const getSelectedLanguage = (state) => state.app.languageSelected;
+

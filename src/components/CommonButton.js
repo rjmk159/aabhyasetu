@@ -30,7 +30,7 @@ function CommonButton(props) {
       disabled={disable}
     >
       {isLoading ? (
-        <ActivityIndicator color={COLORS.gray25} size={"small"} />
+        <ActivityIndicator color={COLORS.black} size={"small"} />
       ) : (
         <Text style={[textStyle]}>{title}</Text>
       )}

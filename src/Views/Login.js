@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Animated,
   Keyboard,
@@ -25,12 +26,13 @@ import { AuthContext } from "../utils/AuthContext";
 import Lottie from "lottie-react-native";
 import { ListItem } from "react-native-elements";
 import TouchableScale from "react-native-touchable-scale";
+import { useDispatch } from "react-redux";
 
 const Login = ({ navigation }) => {
-  const { signIn } = useContext(AuthContext);
-  const [email, setEmail] = useState("");
+
+  const [email, setEmail] = useState("dipali.phatak@gmail1.com");
   const [emailError, setEmailError] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("3dxdxqhU");
   const [passwordError, setPasswordError] = useState("");
   const [invalidCredential, setInvalidCredential] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -38,6 +40,7 @@ const Login = ({ navigation }) => {
   const emailRef = React.useRef(new Animated.Value(0)).current;
   const passwordRef = React.useRef(new Animated.Value(0)).current;
   const animationRef = useRef();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     animationRef.current?.play();
@@ -61,7 +64,7 @@ const Login = ({ navigation }) => {
       let dataToSend = { username: email, password: password };
       loginApp(dataToSend)
         .then((res) => {
-          getDetailsAndNavigate(res);
+          dispatch(setMyProfile(res));
           setLoader(false);
           setEmail("");
           setPassword("");
@@ -81,16 +84,6 @@ const Login = ({ navigation }) => {
     }
   };
 
-  const getDetailsAndNavigate = (res) => {
-    validateToken(res.token)
-      .then((result) => {
-        if (result.id) {
-          signIn(res.token, res, result);
-          dispatch(setMyProfile(res));
-        }
-      })
-      .catch((err) => {});
-  };
 
   return (
     <TouchableOpacity
@@ -102,12 +95,11 @@ const Login = ({ navigation }) => {
     >
       <View style={styles.container}>
         <View style={styles.mainView}>
-          <View style={{flex:0.4, height: 50, overflow: "hidden"}}>
-          <Lottie
-            ref={animationRef}
-            source={require("../assets/JSON/login.json")}
-            style={{ opacity: 0.5 }}
-          />
+          <View style={{ flex: 0.4, height: 40, overflow: "hidden" }}>
+            <Lottie
+              ref={animationRef}
+              source={require("../assets/JSON/login.json")}
+            />
           </View>
           <View style={styles.spaceTop20}>
             <Text style={[styles.loginText]}>Login</Text>
@@ -117,7 +109,7 @@ const Login = ({ navigation }) => {
               <CommonFloatingInput
                 labelText={"Email"}
                 moveText={emailRef}
-                inputStyle={{ color: COLORS.black, fontWeight: "600" }}
+                inputStyle={{ color: COLORS.black, fontWeight: "500" }}
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
@@ -134,7 +126,7 @@ const Login = ({ navigation }) => {
               <CommonFloatingInput
                 labelText={"Password"}
                 moveText={passwordRef}
-                inputStyle={{ color: COLORS.black, fontWeight: "600" }}
+                inputStyle={{ color: COLORS.black, fontWeight: "500" }}
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
@@ -150,11 +142,11 @@ const Login = ({ navigation }) => {
             </View>
           </View>
           {invalidCredential ? (
-            <TouchableOpacity onPress={() => {}} style={styles.spaceTop8}>
+            <TouchableOpacity onPress={() => { }} style={styles.spaceTop8}>
               <Text style={[styles.forgetPasswordReview]}>
                 Review your email and password or{" "}
                 <Text
-                  onPress={() => {}}
+                  onPress={() => { }}
                   style={[styles.forgetPasswordReviewColored]}
                 >
                   Forgot Password?
@@ -162,8 +154,8 @@ const Login = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity onPress={() => {}} style={styles.spaceTop8}>
-              <Text style={[styles.forgetPasswordText]} onPress={() => {}}>
+            <TouchableOpacity onPress={() => { }} style={styles.spaceTop8}>
+              <Text style={[styles.forgetPasswordText]} onPress={() => { }}>
                 Forgot Password?
               </Text>
             </TouchableOpacity>
@@ -177,9 +169,9 @@ const Login = ({ navigation }) => {
               style={{
                 borderRadius: 10,
                 overflow: "hidden",
-                marginHorizontal: 16,
+                // marginHorizontal: 16,
               }}
-              containerStyle={{ backgroundColor: COLORS.one_01_coral }}
+              containerStyle={{ backgroundColor: COLORS.secondary }}
             >
               <ListItem.Content
                 style={{ alignItems: "center", marginHorizontal: 16 }}
@@ -187,7 +179,7 @@ const Login = ({ navigation }) => {
                 <ListItem.Title
                   style={{ color: COLORS.white, fontWeight: "bold" }}
                 >
-                  Login
+                  {!loader ? 'Login' : <ActivityIndicator color={'#fff'} />}
                 </ListItem.Title>
               </ListItem.Content>
             </ListItem>
@@ -203,7 +195,7 @@ const Login = ({ navigation }) => {
                   setEmailError("");
                   setPasswordError("");
                 }}
-                style={{ color: COLORS.one_01_coral, fontWeight: "600" }}
+                style={{ color: COLORS.secondary, fontWeight: "600" }}
               >
                 Register here
               </Text>
@@ -235,8 +227,8 @@ export const styles = StyleSheet.create({
     marginTop: 20,
   },
   loginText: {
-    color: COLORS.one_01_coral,
-    fontSize: 20,
+    color: COLORS.black,
+    fontSize: 16,
     fontWeight: "600",
   },
   spaceTop16: {
@@ -267,5 +259,6 @@ export const styles = StyleSheet.create({
   },
   createAccountText: {
     textDecorationLine: "underline",
+    color: COLORS.gray500
   },
 });

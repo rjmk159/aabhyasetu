@@ -6,13 +6,15 @@
  * @flow strict-local
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
 
 import {
 	FlatList,
 	StatusBar,
 	StyleSheet,
 	Text,
+	TouchableOpacity,
 	useColorScheme,
 	View,
 } from "react-native";
@@ -20,39 +22,58 @@ import {
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { fetchSubjects, setSelectedSubject } from "../reducers/app.reducers";
-import { getProfile, getSubjectsList } from "../reducers/selectors";
+import { getProfileDetails, getProfileSettings, getSubjectList } from "../reducers/selectors";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { ListItem } from "@rneui/themed";
 import TouchableScale from "react-native-touchable-scale"; // https://github.com/kohver/react-native-touchable-scale
 import LinearGradient from "react-native-linear-gradient"; // Only if no expo
 import { screens } from "../constants/screens";
+import SubjectLoader from "../components/Loaders/SubjectLoader";
+
 
 const SubjectsScreen = () => {
 	const isDarkMode = useColorScheme() === "dark";
 	const dispatch = useDispatch();
-	const subjects = useSelector(getSubjectsList);
-	const profile = useSelector(getProfile);
+	const subjects = useSelector(getSubjectList);
+	const profileDetails = useSelector(getProfileDetails);
+	const profileSettings = useSelector(getProfileSettings);
+	const [isLoading, setIsLoading] = useState(true);
 	const Focus = useIsFocused();
 	const navigation = useNavigation();
 
+	const fetch = async () => {
+		setIsLoading(true)
+		await dispatch(fetchSubjects());
+		setIsLoading(false)
+	}
+
+
 	useEffect(() => {
-		dispatch(fetchSubjects());
-	}, [Focus]);
+		fetch();
+	}, []);
 
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
 	};
 
-	const handlePress = (id) => {
-		dispatch(setSelectedSubject(id));
+	const handlePress = (item) => {
+		dispatch(setSelectedSubject(item));
 		navigation.navigate(screens.COURSE_LIST);
 	};
+	const handleProfileOnPress = () => {
+		navigation.reset({
+			index: 0,
+			routes: [{ name: 'Account' }], // Replace with your initial route name
+		  });
+		// navigation.navigate('Account')
+	}
 	const renderItem = ({ item }) => {
 		return (
 			<ListItem
 				Component={TouchableScale}
-				onPress={() => handlePress(item.id)}
+				onPress={() => handlePress(item)}
 				style={styles.listItem}
 				friction={90}
 				bottomDivider
@@ -83,23 +104,35 @@ const SubjectsScreen = () => {
 			<StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
 
 			<View style={styles.sectionContainer}>
-				<Text style={styles.main}>
-					Hi,{" "}
-					<Text style={styles.mainSub}>
-						{profile?.res?.user_nicename || "Friend!"}
+				<View style={styles.mainHeader}>
+					<Text>
+						<Text style={styles.main}>
+							Hi,{" "}
+							<Text style={styles.mainSub}>
+								{profileDetails?.name || "Friend!"}
+							</Text>
+						</Text>
+						<Text style={{ fontSize: 12, fontWeight: '600' }}>{` (${profileSettings.class}th)`}</Text>
 					</Text>
-				</Text>
+					<TouchableOpacity onPress={handleProfileOnPress} style={styles.profileStyleIconContainer}>
+						<View style={styles.profileStyleIcon}>
+							<Ionicons name={"ios-person"} size={30} color={"red"} />
+						</View>
+					</TouchableOpacity>
+				</View>
 				<Text style={styles.mainSubDesc}>Select Subject</Text>
-				<FlatList
+				{!isLoading ? <FlatList
 					scrollEnabled
 					data={subjects}
+					onRefresh={fetch}
+					refreshing={false}
 					renderItem={renderItem}
 					showsVerticalScrollIndicator={false}
 					keyExtractor={(item) => item.id}
 					ListEmptyComponent={
 						<Text style={styles.emptyList}>Nothing to Show here!</Text>
 					}
-				/>
+				/> : [...Array(6).keys()].map((el) => <SubjectLoader />)}
 			</View>
 		</SafeAreaProvider>
 	);
@@ -118,6 +151,26 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: "400",
 	},
+	mainHeader: {
+		flexDirection: 'row',
+		justifyContent: 'space-between'
+	},
+	profileStyleIconContainer: {
+		flexDirection: 'column',
+		alignItems: 'center'
+
+	},
+	profileStyleIcon: {
+		backgroundColor: '#ececec',
+		height: 40,
+		width: 40,
+		alignItems: 'center',
+		justifyContent: 'center',
+		margin: 10,
+		borderRadius: 6,
+		overflow: 'hidden'
+	},
+
 	highlight: {
 		fontWeight: "700",
 	},

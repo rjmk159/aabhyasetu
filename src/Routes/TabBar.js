@@ -10,10 +10,10 @@ export default function App() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-
           if (route.name === "eLearning") {
             iconName = focused ? "laptop" : "laptop-outline";
           } else if (route.name === "Account") {
@@ -21,9 +21,9 @@ export default function App() {
           } else if (route.name === "Courses") {
             iconName = focused ? "ios-list-box" : "ios-list";
           }
-          return <Ionicons name={"add-circle"} size={15} color={"red"} />;
+          return <Ionicons name={iconName} size={15} color={"#F44336"} />;
         },
-        tabBarActiveTintColor: "tomato",
+        tabBarActiveTintColor: "#F44336",
         tabBarInactiveTintColor: "gray",
       })}
     >

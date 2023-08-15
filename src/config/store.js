@@ -1,12 +1,12 @@
-import {applyMiddleware, createStore, compose} from 'redux';
-import {combineReducers} from 'redux';
+import { applyMiddleware, createStore, compose } from 'redux';
+import { combineReducers } from 'redux';
 
-import {persistStore, persistReducer} from 'redux-persist';
+import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import thunkMiddleware from 'redux-thunk';
-import {createLogger} from 'redux-logger';
+import { createLogger } from 'redux-logger';
 
-import appReducer, {initialState} from '../reducers/app.reducers';
+import appReducer, { initialState } from '../reducers/app.reducers';
 
 const enhancers = [
   applyMiddleware(
@@ -31,15 +31,7 @@ const enhancer = composeEnhancers(...enhancers);
 
 const preloadedState = {
   app: initialState,
-  //   cart: {
-  //     items: [],
-  //     total: 0,
-  //   },
-  //   location: {position: {lat: 0, long: 0}},
-  //   auth: {id: 0, loggedin: false, mobile: ''},
-  //   address: {
-  //     addresses: [],
-  //   },
+
 };
 
 const persistConfig = {

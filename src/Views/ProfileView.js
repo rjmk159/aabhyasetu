@@ -1,43 +1,53 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { COLORS } from "../theme/colors";
-import { getProfile } from "../reducers/selectors";
+import { getProfileDetails, getProfileSettings } from "../reducers/selectors";
 import { useSelector } from "react-redux";
-import Lottie from "lottie-react-native";
+import Ionicons from "react-native-vector-icons/MaterialCommunityIcons";
+import { TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { screens } from "../constants/screens";
+
 
 const ProfileView = () => {
-  const profileDetails = useSelector(getProfile);
-  const animationRef = useRef();
+  const profileDetails = useSelector(getProfileDetails);
+  const profileSettings = useSelector(getProfileSettings);
+  const navigation = useNavigation();
+  const handleProfileOnPress = () => {
+    navigation.navigate(screens.PROFILE_EDIT)
+  }
 
-  useEffect(() => {
-    animationRef.current?.play();
-  }, []);
+
 
   return (
     <View style={styles.main}>
-      <Lottie
-        source={require("../assets/JSON/profile.json")}
-        ref={animationRef}
-        style={{ opacity: 0.5 }}
-      />
+
+      <TouchableOpacity onPress={handleProfileOnPress} style={styles.profileStyleIconContainer}>
+        <View style={styles.profileStyleIcon}>
+          <Ionicons name={"account-edit"} size={30} color={"red"} />
+        </View>
+      </TouchableOpacity>
+
       <View style={styles.wrapper}>
         <Text style={styles.heading}>Name:</Text>
-        <Text style={styles.text}>{profileDetails?.result?.name}</Text>
+        <Text style={styles.text}>{profileDetails?.name}</Text>
       </View>
       <View style={styles.wrapper}>
         <Text style={styles.heading}>Email:</Text>
-        <Text style={styles.text}>{profileDetails?.res?.user_email}</Text>
+        <Text style={styles.text}>{profileDetails?.email}</Text>
       </View>
       <View style={styles.wrapper}>
-        <Text style={styles.heading}>Username:</Text>
-        <Text style={styles.text}>{profileDetails?.result?.slug}</Text>
+        <Text style={styles.heading}>Id:</Text>
+        <Text style={[styles.text, styles.textHighlighted]}>{profileDetails?.id}</Text>
       </View>
-      {profileDetails?.res?.description && (
-        <View style={styles.wrapper}>
-          <Text style={styles.heading}>Description:</Text>
-          <Text style={styles.text}>{profileDetails?.res?.description}</Text>
-        </View>
-      )}
+      <View style={styles.wrapper}>
+        <Text style={styles.heading}>Class/Grade:</Text>
+        <Text style={styles.text}>{profileSettings?.class}th</Text>
+      </View>
+      <View style={styles.wrapper}>
+        <Text style={styles.heading}>Language:</Text>
+        <Text style={[styles.text, {textTransform:'capitalize'}]}>{profileSettings?.language}</Text>
+      </View>
     </View>
   );
 };
@@ -46,11 +56,29 @@ export default ProfileView;
 
 const styles = StyleSheet.create({
   main: { flex: 1, padding: 16, backgroundColor: COLORS.white },
-  wrapper: { marginTop: 16 },
+  wrapper: { marginTop: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#ececec', paddingBottom: 10 },
   heading: {
     fontWeight: "bold",
-    fontSize: 25,
-    color: COLORS.one_01_coral,
+    fontSize: 16,
+    color: COLORS.primary,
+    marginRight: 10
   },
-  text: { marginTop: 8, fontSize: 20, color: COLORS.black },
+  text: { marginTop: 4, fontSize: 16, color: COLORS.black },
+  profileStyleIconContainer: {
+    flexDirection: 'column',
+    alignItems: 'center'
+
+  },
+  textHighlighted:{backgroundColor:'#ececec', padding: 2, width: 30, textAlign:'center', borderRadius: 10, fontWeight:'bold', fontSize: 12},
+  profileStyleIcon: {
+    backgroundColor: '#ececec',
+    height: 60,
+    width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 10,
+    borderRadius: 6,
+    overflow: 'hidden'
+  },
+
 });

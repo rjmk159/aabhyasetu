@@ -4,88 +4,140 @@ import {
   getCoursesCategories,
   getCoursesListBasedOnSub,
 } from "../utils/api";
-import { getSelectedSubjected } from "./selectors";
+import { getCourses, getCoursesList, getSelectedSubject, getSelectedSubjected } from "./selectors";
 
 export const initialState = {
-  courses: [],
-  lessons: [],
-  subjects: [],
-
-  instructors: [],
-  myProfile: {},
-
-  languageSelected: "english",
-  gradeSelected: "11",
-  subjectSelected: -1,
-  currentCourse: -1,
-  currentLesson: -1,
-
+  subject: {
+    list: [],
+    selected: null,
+  },
+  course: {
+    list: [],
+    selected: null,
+    page: 1,
+  },
+  lesson: {
+    list: [],
+    selected: null,
+    page: 1,
+  },
+  profile: {
+    details: {
+    },
+    auth: {
+      token: null,
+      lastLogin: null
+    },
+    settings: {
+      language: 'english',
+      class: '11'
+    }
+  },
   media: [],
-  isLoading: false,
 };
 const { actions, reducer } = createSlice({
   name: "app",
   initialState: initialState,
   reducers: {
+    /* Main Listing */
     setSubjects: (state, { payload }) => {
-      state.subjects = payload;
+      state.subject.list = payload;
+
+      // state.course.list = [];
+      state.lesson.list = [];
+      state.course.page = 1;
+      state.lesson.page = 1;
     },
     setCourses: (state, { payload }) => {
-      state.courses = payload;
+      state.course.list = payload;
+
+      state.lesson.list = [];
+      state.lesson.page = 1;
     },
     setLesson: (state, { payload }) => {
-      state.lessons = payload;
+      state.lesson.list = payload;
     },
-    // *************
 
+    /* currently Selected */
     setSelectedSubject: (state, { payload }) => {
-      state.subjectSelected = payload;
+      state.subject.selected = payload;
+      state.course.list = []; // TO DO
+      state.lesson.list = [];
+      state.lesson.page = 1;
+      state.course.page = 1;
     },
-    setCurrentCourse: (state, { payload }) => {
-      state.currentCourse = payload;
+    setSelectedCourse: (state, { payload }) => {
+      state.course.selected = payload;
+      state.lesson.page = 1;
     },
-    setCurrentLesson: (state, { payload }) => {
-      state.currentLesson = payload;
+    setSelectedLesson: (state, { payload }) => {
+      state.lesson.selected = payload;
+    },
+
+    /* Pagination */
+    setCoursePage: (state, { payload }) => {
+      state.course.page = payload;
+    },
+
+    /* Profile */
+    setMyProfile: (state, { payload }) => {
+      state.profile.details = { name: payload.user_display_name, id: payload.user_id, email: payload.user_email, firstName: payload.firstname, lastName: payload.lastname };
+      state.profile.auth = { token: payload.token, lastLogin: Date.now() };
+      state.profile.settings = { class: payload.class_ || '11', language: payload.language || 'english' }
+    },
+    setProfileDetails: (state, { payload }) => {
+      state.profile.details = { ...state.profile.details, ...payload };
     },
     setGrade: (state, { payload }) => {
-      state.gradeSelected = payload;
+      state.profile.settings.class = payload;
     },
     setLanguage: (state, { payload }) => {
-      state.languageSelected = payload;
+      state.profile.settings.language = payload;
     },
 
-    // *************
+    /* App */
+    doLogout: (state) => {
+      state.profile = initialState.profile,
+        state.subject = initialState.subject,
+        state.course = initialState.subject,
+        state.lesson = initialState.lesson
+    },
+
+    /* Others */
     setInstructors: (state, { payload }) => {
       state.instructors = payload;
     },
     setMedia: (state, { payload }) => {
       state.media = payload;
     },
-    setMyProfile: (state, { payload }) => {
-      state.myProfile = payload;
-    },
-    setIsLoading: (state, { payload }) => {
-      state.isLoading = payload;
-    },
+
   },
 });
 export const {
+  setSubjects,
   setCourses,
   setLesson,
-  setSubjects,
 
-  setInstructors,
+
+  setSelectedSubject,
+  setSelectedCourse,
+  setSelectedLesson,
+
+  setCoursePage,
+
   setMyProfile,
-
+  setProfileDetails,
   setGrade,
   setLanguage,
-  setCurrentCourse,
-  setCurrentLesson,
-  setSelectedSubject,
+  doLogout,
 
-  setMedia,
-  setIsLoading,
+  setInstructors,
+  setMedia
+
+
+
 } = actions;
+
 export default reducer;
 
 export const fetchSubjects = () => async (dispatch) => {
@@ -97,27 +149,36 @@ export const fetchSubjects = () => async (dispatch) => {
     return true;
   }
 };
-export const fetchCoursesList = () => async (dispatch, getState) => {
+export const fetchCoursesList = (page = 1) => async (dispatch, getState) => {
   try {
     const state = getState();
-    const subId = getSelectedSubjected(state);
-    dispatch(setIsLoading(true));
-    const res = await getCoursesListBasedOnSub(subId);
-    dispatch(setCourses(res));
-    dispatch(setIsLoading(false));
+    const selectedSubjected = getSelectedSubject(state);
+    const currentCourse = getCoursesList(state);
+    if (page > Math.ceil(selectedSubjected.count / 10)) {
+      return false;
+    }
+
+    dispatch(setCoursePage(page + 1));
+    const res = await getCoursesListBasedOnSub(selectedSubjected.id, page);
+    console.log(">>>", res);
+    if (page === 1) {
+      dispatch(setCourses(res));
+    } else {
+      dispatch(setCourses([...currentCourse, ...res]));
+    }
+
     return true;
   } catch (error) {
-    return true;
+    console.log(error)
+    return false;
   }
 };
 
 export const fetchLessonsBasedOnCurrentCourse =
   (courseId) => async (dispatch) => {
     try {
-      dispatch(setIsLoading(true));
       const res = await getLessonsById(courseId);
       dispatch(setLesson(res));
-      dispatch(setIsLoading(false));
       return true;
     } catch (error) {
       return true;
