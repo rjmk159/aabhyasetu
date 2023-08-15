@@ -12,6 +12,7 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
+  ToastAndroid,
   useColorScheme,
 } from "react-native";
 
@@ -76,15 +77,27 @@ const SettingsScreen = () => {
       ID: Number(profileDetails.id)
     }
     try {
-      await updateUserMeta(data, profileAuth.token);
+      const res =  await updateUserMeta(data, profileAuth.token);
       setIsLoading(false);
-
+      console.log(res)
+    if(res.success){
       dispatch(setGrade(data.class));
       dispatch(setLanguage(data.language));
 
-      navigation.navigate(screens.SUBJECT_LIST);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'eLearning' }], // Replace with your initial route name
+      });
+    } else {
+      setStateGrade(settings.class);
+      setStateLanguage(settings.language)
+    }
+      ToastAndroid.showWithGravity(res?.message, ToastAndroid.LONG, ToastAndroid.TOP);
+
     } catch (error) {
+      console.log(error)
       setIsLoading(false);
+      ToastAndroid.showWithGravity(error?.message, ToastAndroid.LONG, ToastAndroid.TOP,);
       // reverting values if not updated
       setStateGrade(settings.class);
       setStateLanguage(settings.language)
@@ -95,7 +108,6 @@ const SettingsScreen = () => {
     <ScrollView
       contentContainerStyle={{ paddingBottom: 30 }}
       showsVerticalScrollIndicator={false}
-      key={flag}
     >
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
 

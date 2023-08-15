@@ -17,6 +17,7 @@ import {
   useColorScheme,
   View,
   TouchableOpacity,
+  ToastAndroid,
 } from "react-native";
 
 import { Colors } from "react-native/Libraries/NewAppScreen";
@@ -123,14 +124,14 @@ const SettingsScreen = () => {
     try {
       setIsLoading(true);
       const res = await deleteProfileHandler({ id: profileDetails.id }, profileAuth.token)
-      console.log(res);
       if (res.success) {
         handleSignOut();
+        ToastAndroid.showWithGravity(res?.message, ToastAndroid.LONG, ToastAndroid.TOP);
       }
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
+      ToastAndroid.showWithGravity(error?.message, ToastAndroid.LONG, ToastAndroid.TOP);
     }
 
   }

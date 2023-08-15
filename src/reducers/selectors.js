@@ -1,7 +1,7 @@
 export const getSubjectList = (state) => {
   let grade = state.app?.profile.settings.class;
   return state.app?.subject.list?.filter(
-    (value) => value.name.includes(`-${grade ?? '11'}`) && value
+    (value) => value?.name?.includes(`-${grade}`)
   );
 };
 export const getSelectedSubject = (state) => state.app.subject.selected;

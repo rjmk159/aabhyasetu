@@ -1,4 +1,4 @@
-import { ActivityIndicator, Animated, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Animated, StyleSheet, Text, ToastAndroid, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { COLORS } from "../theme/colors";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,14 +32,14 @@ const EditProfile = () => {
   const lastNameRef = React.useRef(new Animated.Value(0)).current;
   const firstNameRed = React.useRef(new Animated.Value(0)).current;
   const animationRef = useRef();
-  const dispatch =  useDispatch();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     animationRef.current?.play();
   }, []);
 
   const editProfile = async () => {
-    if(isLoading) return;
+    if (isLoading) return;
     let dataToSend = {
       email,
       // name,
@@ -50,12 +50,13 @@ const EditProfile = () => {
     setIsLoading(true);
     editProfileHandler(dataToSend, profileAuth.token)
       .then((res) => {
-        console.log(res);
         dispatch(setProfileDetails(res.details))
         setIsLoading(false);
+        ToastAndroid.showWithGravity(res?.message, ToastAndroid.LONG, ToastAndroid.TOP);
       })
       .catch((err) => {
         setIsLoading(false);
+        ToastAndroid.showWithGravity(err?.message, ToastAndroid.LONG, ToastAndroid.TOP);
       });
   };
 

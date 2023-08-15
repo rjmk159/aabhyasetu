@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   StyleSheet,
@@ -12,6 +12,7 @@ import {
 import { Block, Text, Button, theme } from "galio-framework";
 import { useWindowDimensions } from "react-native";
 import MaterialTabs from "react-native-material-tabs";
+import Lottie from "lottie-react-native";
 
 import HTML from "react-native-render-html";
 
@@ -21,24 +22,30 @@ const { width } = Dimensions.get("screen");
 import { materialTheme } from "../constants";
 import { getCourseLessons, getSelectedCourse } from "../reducers/selectors";
 import {
-  fetchLessonsBasedOnCurrentCourse,
-  setCurrentLesson,
+  fetchLessonsBasedOnCurrentCourse, setSelectedLesson,
+  
 } from "../reducers/app.reducers";
 import { screens } from "../constants/screens";
+import { COLORS } from "../theme/colors";
 
 const CourseDetails = ({ navigation }) => {
   const dispatch = useDispatch();
   let course = useSelector(getSelectedCourse);
+  const animationRef = useRef();
+
   let lessons = useSelector(getCourseLessons);
   const [selectedTab, setSelectedTab] = useState(0);
-
   if (course && course.length) {
     course = course[0];
   }
   const contentWidth = useWindowDimensions().width;
 
+  useEffect(() => {
+    animationRef.current?.play();
+  }, [lessons.length]);
+
   const handleOpenLesson = (item) => {
-    dispatch(setCurrentLesson(item));
+    dispatch(setSelectedLesson(item));
     navigation.navigate(screens.LESSON_DETAILS);
   };
   const Curriculum = () => {
@@ -60,7 +67,10 @@ const CourseDetails = ({ navigation }) => {
             );
           })
         ) : (
-          <Text style={{ padding: 10 }}>No Curriculum found</Text>
+          <View style={{ flex: 1, alignItems:'center', justifyContent:'center' }}>
+          <Lottie ref={animationRef} style={{ height: 100}} source={require("../assets/JSON/empty.json")} />
+          <Text>Nothing to show here</Text>
+        </View>
         )}
       </Block>
     );
@@ -81,9 +91,9 @@ const CourseDetails = ({ navigation }) => {
               selectedIndex={selectedTab}
               style={{ borderRadius: 5, overflow: "hidden" }}
               onChange={(index) => setSelectedTab(index)}
-              barColor={"#FF9800"}
-              indicatorColor={materialTheme.COLORS.BLACK}
-              activeTextColor={materialTheme.COLORS.BLACK}
+              barColor={COLORS.primary}
+              indicatorColor={materialTheme.COLORS.WHITE}
+              activeTextColor={materialTheme.COLORS.WHITE}
             />
           </SafeAreaView>
         </Block>

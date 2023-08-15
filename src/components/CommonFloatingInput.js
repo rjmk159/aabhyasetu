@@ -29,7 +29,7 @@ export const CommonFloatingInput = (props) => {
     secureTextEntry,
     wrapperStyle,
     keyboardType,
-    editable,
+    editable = true,
     maxLength,
   } = props;
 
@@ -72,6 +72,7 @@ export const CommonFloatingInput = (props) => {
           styles.container,
           wrapperStyle,
           { borderColor: errorText ? COLORS?.redEF374E : COLORS.gray100 },
+          !editable ? {backgroundColor:'#ececec'}:{backgroundColor:'#fff'}
         ]}
       >
         <Animated.View

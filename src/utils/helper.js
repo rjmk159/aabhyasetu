@@ -1,6 +1,8 @@
 
 export const hasLoggedIn10DaysBack = (lastLogin) => {
+
   const currentLogin = Date.now();
+
   const millisecondsPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
 
   // Calculate the difference in milliseconds between the two epochs

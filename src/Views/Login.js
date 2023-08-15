@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   default as React,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -8,11 +9,12 @@ import {
 } from "react";
 import {
   ActivityIndicator,
-  Alert,
+  ToastAndroid,
   Animated,
   Keyboard,
   StyleSheet,
   Text,
+  Linking,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -21,7 +23,7 @@ import { CommonFloatingInput } from "../components/CommonFloatingInput";
 import { screens } from "../constants/screens";
 import { setMyProfile } from "../reducers/app.reducers";
 import { COLORS } from "../theme/colors";
-import { loginApp, validateToken } from "../utils/api";
+import { BASE_URL, loginApp, validateToken } from "../utils/api";
 import { AuthContext } from "../utils/AuthContext";
 import Lottie from "lottie-react-native";
 import { ListItem } from "react-native-elements";
@@ -30,9 +32,9 @@ import { useDispatch } from "react-redux";
 
 const Login = ({ navigation }) => {
 
-  const [email, setEmail] = useState("dipali.phatak@gmail1.com");
+  const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [password, setPassword] = useState("3dxdxqhU");
+  const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [invalidCredential, setInvalidCredential] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -41,6 +43,13 @@ const Login = ({ navigation }) => {
   const passwordRef = React.useRef(new Animated.Value(0)).current;
   const animationRef = useRef();
   const dispatch = useDispatch();
+
+  const handlePress = useCallback(async () => {
+
+    await Linking.openURL(`${BASE_URL}/lost-password/`);
+
+  }, []);
+
 
   useEffect(() => {
     animationRef.current?.play();
@@ -70,16 +79,19 @@ const Login = ({ navigation }) => {
           setPassword("");
           setEmailError("");
           setPasswordError("");
+
+          ToastAndroid.showWithGravity('Login Successful!', ToastAndroid.LONG, ToastAndroid.TOP,);
+
         })
         .catch((e) => {
           setLoader(false);
           let message = "";
           if (e.message.includes("404") || e.message.includes("403")) {
             message = "Invalid username or password";
-            setInvalidCredential(true);
           } else {
             message = e.message;
           }
+          ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.TOP,);
         });
     }
   };
@@ -144,18 +156,12 @@ const Login = ({ navigation }) => {
           {invalidCredential ? (
             <TouchableOpacity onPress={() => { }} style={styles.spaceTop8}>
               <Text style={[styles.forgetPasswordReview]}>
-                Review your email and password or{" "}
-                <Text
-                  onPress={() => { }}
-                  style={[styles.forgetPasswordReviewColored]}
-                >
-                  Forgot Password?
-                </Text>
+                Password or email is incorrect
               </Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity onPress={() => { }} style={styles.spaceTop8}>
-              <Text style={[styles.forgetPasswordText]} onPress={() => { }}>
+            <TouchableOpacity onPress={handlePress} style={styles.spaceTop8}>
+              <Text style={[styles.forgetPasswordText]}>
                 Forgot Password?
               </Text>
             </TouchableOpacity>
@@ -244,6 +250,7 @@ export const styles = StyleSheet.create({
   forgetPasswordReview: {
     color: COLORS?.redEF374E,
     marginTop: 16,
+    textAlign: 'center'
   },
   forgetPasswordReviewColored: {
     color: COLORS.redEF374E,

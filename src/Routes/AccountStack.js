@@ -70,11 +70,11 @@ const HomeStack = () => {
         options={{ title: "Edit Profile" }}
         component={EditProfile}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={screens.SUBJECT_LIST}
         options={{title: 'Select Subject', headerShown: false}}
         component={SubjectsScreen}
-      />
+      /> */}
       <Stack.Screen
         name={screens.FEEDBACK}
         options={{ title: "Feedback" }}

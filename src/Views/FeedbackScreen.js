@@ -4,6 +4,7 @@ import {
   Keyboard,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -16,16 +17,22 @@ import TouchableScale from "react-native-touchable-scale";
 import Lottie from "lottie-react-native";
 import { submitFeedback } from "../utils/api";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { getProfileAuth, getProfileDetails } from "../reducers/selectors";
+import { ActivityIndicator } from "react-native";
 
 const FeedbackScreen = () => {
-  const [email, setEmail] = useState("");
+  const profileDetails = useSelector(getProfileDetails)
+  const profileAuth = useSelector(getProfileAuth)
+  const [email, setEmail] = useState(profileDetails.email);
   const [emailError, setEmailError] = useState("");
-  const [name, setName] = useState("");
+  const [name, setName] = useState(profileDetails.name);
   const [nameError, setNameError] = useState("");
   const [subject, setSubject] = useState("");
   const [subjectError, setSubjectError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [feedbackError, setFeedbackError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const emailRef = React.useRef(new Animated.Value(0)).current;
   const nameRef = React.useRef(new Animated.Value(0)).current;
@@ -39,11 +46,9 @@ const FeedbackScreen = () => {
   }, []);
 
   const feedBackHandler = () => {
+
     Keyboard.dismiss();
-    let emailError1 = "";
-    let nameError1 = "";
-    let phoneError1 = "";
-    let feedbackError1 = "";
+    if(isLoading) return;
     if (email?.length == 0) {
       setEmailError("Please enter email address");
       emailError1 = "Please enter email address";
@@ -72,15 +77,21 @@ const FeedbackScreen = () => {
         email,
         subject,
         feedback,
+        id: profileDetails.id
       };
-      submitFeedback(dataToSend)
+      setIsLoading(true)
+      submitFeedback(dataToSend, profileAuth.token)
         .then((res) => {
-          if (res.status === "mail_sent") {
+          if (res.success) {
+            setIsLoading(false);
             navigation.goBack();
           }
+          setIsLoading(false);
+          ToastAndroid.showWithGravity('Thankyou for your feedback, we will contact you shortly', ToastAndroid.LONG, ToastAndroid.TOP);
         })
         .catch((err) => {
-          Alert.alert(err.message);
+          setIsLoading(false);
+          ToastAndroid.showWithGravity(err.message, ToastAndroid.LONG, ToastAndroid.TOP);
         });
     }
   };
@@ -94,17 +105,20 @@ const FeedbackScreen = () => {
     >
       <View style={{ flex: 1, padding: 16, backgroundColor: COLORS.white }}>
         <Text style={styles.loginText}>Add your feedback here!!</Text>
-        <Lottie
-          ref={animationRef}
-          source={require("../assets/JSON/feedback.json")}
-          style={{ opacity: 0.7 }}
-        />
+        <View style={{ flex: 0.3 }}>
+          <Lottie
+            ref={animationRef}
+            source={require("../assets/JSON/feedback.json")}
+            style={{ opacity: 1 }}
+          />
+        </View>
         <View style={{ flex: 1 }}>
           <CommonFloatingInput
             labelText={"Name"}
             moveText={nameRef}
             inputStyle={{ color: COLORS.black, fontWeight: "600" }}
-            value={name}
+            value={profileDetails.name}
+            editable={false}
             onChangeText={(text) => {
               setName(text);
               setNameError("");
@@ -117,12 +131,14 @@ const FeedbackScreen = () => {
           <CommonFloatingInput
             labelText={"Email"}
             moveText={emailRef}
+
             inputStyle={{ color: COLORS.black, fontWeight: "600" }}
-            value={email}
+            value={profileDetails.email}
             onChangeText={(text) => {
               setEmail(text);
               setEmailError("");
             }}
+            editable={false}
             keyboardType={"email-address"}
             errorText={emailError}
             labelTextStyle={{ color: COLORS.gray500 }}
@@ -166,11 +182,11 @@ const FeedbackScreen = () => {
             borderRadius: 10,
             overflow: "hidden",
           }}
-          containerStyle={{ backgroundColor: COLORS.one_01_coral }}
+          containerStyle={{ backgroundColor: COLORS.primary }}
         >
           <ListItem.Content style={{ alignItems: "center" }}>
             <ListItem.Title style={{ color: COLORS.white, fontWeight: "bold" }}>
-              Send Feedback
+              {isLoading ? <ActivityIndicator color={"#fff"} /> : 'Send Feedback'}
             </ListItem.Title>
           </ListItem.Content>
         </ListItem>
@@ -183,7 +199,7 @@ export default FeedbackScreen;
 
 const styles = StyleSheet.create({
   loginText: {
-    color: COLORS.one_01_coral,
+    color: COLORS.primary,
     fontSize: 20,
     fontWeight: "600",
   },

@@ -4,7 +4,7 @@ import {
   getCoursesCategories,
   getCoursesListBasedOnSub,
 } from "../utils/api";
-import { getCourses, getCoursesList, getSelectedSubject, getSelectedSubjected } from "./selectors";
+import { getCourses, getCoursesList, getProfileAuth, getSelectedSubject, getSelectedSubjected } from "./selectors";
 
 export const initialState = {
   subject: {
@@ -160,7 +160,6 @@ export const fetchCoursesList = (page = 1) => async (dispatch, getState) => {
 
     dispatch(setCoursePage(page + 1));
     const res = await getCoursesListBasedOnSub(selectedSubjected.id, page);
-    console.log(">>>", res);
     if (page === 1) {
       dispatch(setCourses(res));
     } else {
@@ -169,15 +168,16 @@ export const fetchCoursesList = (page = 1) => async (dispatch, getState) => {
 
     return true;
   } catch (error) {
-    console.log(error)
     return false;
   }
 };
 
 export const fetchLessonsBasedOnCurrentCourse =
-  (courseId) => async (dispatch) => {
+  (courseId) => async (dispatch, getState) => {
     try {
-      const res = await getLessonsById(courseId);
+      const state = getState();
+      const profileAuth = getProfileAuth(state)
+      const res = await getLessonsById(courseId, profileAuth.token);
       dispatch(setLesson(res));
       return true;
     } catch (error) {

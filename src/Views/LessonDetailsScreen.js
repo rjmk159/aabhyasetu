@@ -13,10 +13,10 @@ import HTML from 'react-native-render-html';
 const {width} = Dimensions.get('screen');
 
 import {materialTheme} from '../constants';
-import {getLessonDetails} from '../reducers/selectors';
+import {getLessonDetails, getSelectedLession} from '../reducers/selectors';
 
 const LessonDetailsScreen = props => {
-  let lesson = useSelector(getLessonDetails);
+  let lesson = useSelector(getSelectedLession);
 
   if (lesson && lesson.length) {
     lesson = lesson[0];

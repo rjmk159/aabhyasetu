@@ -1,7 +1,7 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, ToastAndroid } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import SplashScreen from "react-native-splash-screen";
@@ -11,24 +11,36 @@ import TabBarButtom from "./src/Routes/TabBar";
 import Login from "./src/Views/Login";
 import SignUp from "./src/Views/SignUp";
 import { useDispatch, useSelector } from "react-redux";
-import { getProfileAuth } from "./src/reducers/selectors";
+import { getCoursesList, getProfileAuth } from "./src/reducers/selectors";
 import { hasLoggedIn10DaysBack } from './src/utils/helper'
 import { doLogout } from "./src/reducers/app.reducers";
+import { validateToken } from "./src/utils/api";
+
 
 const App = () => {
 
   const Stack = createNativeStackNavigator();
   const profile = useSelector(getProfileAuth);
+  const course = useSelector(getCoursesList);
   const isLoggedIn = !!(profile?.token);
   const dispatch = useDispatch();
 
+
+  const validateToken_ = async () => {
+    const res = await validateToken(profile.token);
+    return res.code === 'jwt_auth_valid_token';
+  }
   React.useEffect(() => {
     SplashScreen.hide();
-    if(hasLoggedIn10DaysBack(profile.lastLogin)) {
+    if (hasLoggedIn10DaysBack(profile.lastLogin) || !validateToken_()) {
       dispatch(doLogout());
+      setTimeout(() => {
+        ToastAndroid.showWithGravity("Your session has expired, Re-login to continue", ToastAndroid.LONG, ToastAndroid.TOP);
+      }, 10);
+
     }
 
-  }, [dispatch]);
+  }, [dispatch, course]);
 
   return (
     <GestureHandlerRootView style={styles.container}>

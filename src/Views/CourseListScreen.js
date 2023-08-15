@@ -20,7 +20,11 @@ const CourseListScreen = () => {
   const [isFooterLoading, setIsFooterLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const currentCoursePage = useSelector(getCoursePage);
-  const animationref = useRef();
+  const animationRef = useRef();
+
+  useEffect(() => {
+    animationRef.current?.play();
+  }, [isLoading]);
 
   const onPress = (item) => {
     dispatch(setSelectedCourse(item));
@@ -57,7 +61,7 @@ const CourseListScreen = () => {
           data={courses}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           onEndReached={handleLoadMore}
           onRefresh={getCourseList}
           refreshing={false}
@@ -65,10 +69,11 @@ const CourseListScreen = () => {
           ListFooterComponent={isFooterLoading ? <ActivityIndicator /> : null}
         />
       ) : (
-        <View style={{ flex: 1 }}>
-          <Lottie source={require("../assets/JSON/empty.json")} />
+        <View style={{ flex: 1, alignItems:'center', justifyContent:'center' }}>
+          <Lottie ref={animationRef} style={{ height: 100}} source={require("../assets/JSON/empty.json")} />
+          <Text>Nothing to show here</Text>
         </View>
-      ): [...Array(4).keys()].map((el) => <CourseLoader />)}
+      ) : [...Array(4).keys()].map((el) => <CourseLoader key={el} />)}
     </Block>
   );
 };

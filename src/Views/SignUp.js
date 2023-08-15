@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Animated,
   Image,
   Keyboard,
@@ -6,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -33,9 +35,10 @@ const SignUp = () => {
   const [passwordError, setPasswordError] = useState("");
   const [userNameError, setUserNameError] = useState("");
 
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const handleCreateAccount = () => {
+    if(isLoading) return;
     if (firstName?.length === 0) {
       setfirstNameError("Please enter first name");
     }
@@ -82,11 +85,12 @@ const SignUp = () => {
             setPassword("");
             setUserName("");
             navigation.navigate(screens.LOGIN);
+            ToastAndroid.showWithGravity('Registered Successfully, Login to continue!', ToastAndroid.LONG, ToastAndroid.TOP,);
           }
         })
         .catch((err) => {
           setLoading(false);
-          alert(err?.message);
+          ToastAndroid.showWithGravity(err?.message, ToastAndroid.LONG, ToastAndroid.TOP,);
         });
     }
   };
@@ -108,7 +112,7 @@ const SignUp = () => {
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <Text
           style={{
-            color: COLORS.one_01_coral,
+            color: COLORS.primary,
             fontSize: 20,
             fontWeight: "600",
           }}
@@ -117,7 +121,7 @@ const SignUp = () => {
         </Text>
 
         <View style={styles.tellUsWrapper}>
-          <Text style={[]}>Tell us more about you</Text>
+          <Text style={{color:COLORS.black}}>Tell us more about you</Text>
           <CommonFloatingInput
             labelText={"First Name"}
             moveText={firstNameRef}
@@ -207,7 +211,7 @@ const SignUp = () => {
                 overflow: "hidden",
                 marginHorizontal: 16,
               }}
-              containerStyle={{ backgroundColor: COLORS.one_01_coral }}
+              containerStyle={{ backgroundColor: COLORS.primary }}
             >
               <ListItem.Content
                 style={{ alignItems: "center", marginHorizontal: 16 }}
@@ -215,7 +219,7 @@ const SignUp = () => {
                 <ListItem.Title
                   style={{ color: COLORS.white, fontWeight: "bold" }}
                 >
-                  Sign Up
+                  {!isLoading ? 'Sign Up': <ActivityIndicator color={"#fff"}/>}
                 </ListItem.Title>
               </ListItem.Content>
             </ListItem>

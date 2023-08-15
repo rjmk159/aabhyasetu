@@ -1,17 +1,9 @@
 import axios from "axios";
-import { checkAUTH } from "../utils/helper";
 
 // export const BASE_URL = 'https://kitchenitems.click/learning';
 export const BASE_URL = "https://abhyasetu.in";
 
-const getAuthorization = async () => {
-  const LOGIN_TOKEN = await checkAUTH();
-  if (LOGIN_TOKEN) {
-    return {
-      headers: { Authorization: `Bearer ${LOGIN_TOKEN}` },
-    };
-  }
-};
+
 
 export const BASE_URL_JSON = `${BASE_URL}/wp-json/wp/v2`;
 export const BASE_URL_AUTH = `${BASE_URL}/wp-json/jwt-auth/v1/token`;
@@ -29,9 +21,10 @@ export const loginApp = (dataToSend) => {
   });
 };
 export const validateToken = (JWT) => {
+
   return new Promise((resolve, reject) => {
     axios
-      .get(`${BASE_URL_JSON}/users/me`, {
+      .post(`${BASE_URL_AUTH}/validate`, {}, {
         headers: {
           Authorization: `Bearer ${JWT}`,
         },
@@ -40,6 +33,7 @@ export const validateToken = (JWT) => {
         resolve(response.data);
       })
       .catch((error) => {
+        console.log(error);
         reject(error);
       });
   });
@@ -79,11 +73,9 @@ export const updateUserMeta = (data, jwt) => {
         },
       })
       .then((response) => {
-        console.log(response.data);
-        resolve(response);
+        resolve(response.data);
       })
       .catch((error) => {
-        console.log(error);
         reject(error);
       });
   });
@@ -113,11 +105,15 @@ export const getCoursesCategories = () => {
       });
   });
 };
-export const getLessonsById = async (id) => {
-  const config = await getAuthorization();
+export const getLessonsById = async (id, jwt) => {
+
   return new Promise((resolve, reject) => {
     axios
-      .get(`${BASE_URL}/wp-json/ldlms/v2/sfwd-lessons/?course=${id}`, config)
+      .get(`${BASE_URL}/wp-json/ldlms/v2/sfwd-lessons/?course=${id}`, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      })
       .then((response) => {
         resolve(response.data);
       })
@@ -127,21 +123,21 @@ export const getLessonsById = async (id) => {
   });
 };
 
-export const submitFeedback = (data) => {
+export const submitFeedback = (data, jwt) => {
   return new Promise((resolve, reject) => {
-    let formdata = new FormData();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
 
-    formdata.append("your-name", data.name);
-    formdata.append("your-email", data.email);
-    formdata.append("your-subject", data.subject);
-    formdata.append("your-message", data.feedback);
+    };
     axios
       .post(
-        `${BASE_URL}/wp-json/contact-form-7/v1/contact-forms/27738/feedback`,
-        JSON.stringify(formdata)
+        `${BASE_URL}/wp-json/add/feedback`, { ...data },
+        config
       )
       .then((response) => {
-        resolve(response);
+        resolve(response.data);
       })
       .catch((error) => {
         reject(error);
@@ -175,17 +171,15 @@ export const deleteProfileHandler = (data, jwt) => {
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
-    data : {...data}
+    data: { ...data }
   };
   return new Promise((resolve, reject) => {
     axios
       .delete(`${BASE_URL}/wp-json/delete/subscriber`, config)
       .then((res) => {
-        console.log(res)
         resolve(res.data);
       })
       .catch((err) => {
-        console.log(err)
         reject(err);
       });
   });

@@ -37,6 +37,7 @@ const SubjectsScreen = () => {
 	const isDarkMode = useColorScheme() === "dark";
 	const dispatch = useDispatch();
 	const subjects = useSelector(getSubjectList);
+	console.log('subjects', subjects)
 	const profileDetails = useSelector(getProfileDetails);
 	const profileSettings = useSelector(getProfileSettings);
 	const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +53,10 @@ const SubjectsScreen = () => {
 
 	useEffect(() => {
 		fetch();
-	}, []);
+		return function () {
+			// isComponentMounted.current = false;
+		 };
+	}, [Focus]);
 
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -128,11 +132,11 @@ const SubjectsScreen = () => {
 					refreshing={false}
 					renderItem={renderItem}
 					showsVerticalScrollIndicator={false}
-					keyExtractor={(item) => item.id}
+					keyExtractor={(item) => item.id.toString()}
 					ListEmptyComponent={
 						<Text style={styles.emptyList}>Nothing to Show here!</Text>
 					}
-				/> : [...Array(6).keys()].map((el) => <SubjectLoader />)}
+				/> : [...Array(6).keys()].map((el) => <SubjectLoader key={el} />)}
 			</View>
 		</SafeAreaProvider>
 	);
