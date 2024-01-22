@@ -11,10 +11,11 @@ import TabBarButtom from "./src/Routes/TabBar";
 import Login from "./src/Views/Login";
 import SignUp from "./src/Views/SignUp";
 import { useDispatch, useSelector } from "react-redux";
-import { getCoursesList, getProfileAuth } from "./src/reducers/selectors";
+import { getCoursesList, getProfileAuth, getProfileSettings } from "./src/reducers/selectors";
 import { hasLoggedIn10DaysBack } from './src/utils/helper'
 import { doLogout } from "./src/reducers/app.reducers";
 import { validateToken } from "./src/utils/api";
+import TabOrSettings from "./src/Routes/TabOrSettings";
 
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
   const Stack = createNativeStackNavigator();
   const profile = useSelector(getProfileAuth);
   const course = useSelector(getCoursesList);
+  const settings = useSelector(getProfileSettings);
   const isLoggedIn = !!(profile?.token);
   const dispatch = useDispatch();
 
@@ -61,7 +63,7 @@ const App = () => {
             </Stack.Navigator>
           </>
         ) : (
-          <TabBarButtom />
+          <TabOrSettings shouldRenderTabBar={settings.class && settings.language} />
         )}
       </NavigationContainer>
     </GestureHandlerRootView>

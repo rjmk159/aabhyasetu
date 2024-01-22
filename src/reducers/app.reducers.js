@@ -83,7 +83,8 @@ const { actions, reducer } = createSlice({
     setMyProfile: (state, { payload }) => {
       state.profile.details = { name: payload.user_display_name, id: payload.user_id, email: payload.user_email, firstName: payload.firstname, lastName: payload.lastname };
       state.profile.auth = { token: payload.token, lastLogin: Date.now() };
-      state.profile.settings = { class: payload.class_ || '11', language: payload.language || 'english' }
+      // state.profile.settings = { class: payload.class_ || '11', language: payload.language || 'english' }
+      state.profile.settings = { class: payload.class_, language: payload.language }
     },
     setProfileDetails: (state, { payload }) => {
       state.profile.details = { ...state.profile.details, ...payload };

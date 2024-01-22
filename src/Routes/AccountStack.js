@@ -1,6 +1,4 @@
 import * as React from "react";
-import { View, TouchableOpacity } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 
 import AccountScreen from "../Views/AccountScreen";
 // import CourseListScreen from '../Views/CourseListScreen';
@@ -16,38 +14,17 @@ import ProfileView from "../Views/ProfileView";
 import EditProfile from "../Views/EditProfile";
 import FeedbackScreen from "../Views/FeedbackScreen";
 import SubjectsScreen from "../Views/SubjectsScreen";
+import StackOptions from "../components/StackOptions";
 
 const Stack = createNativeStackNavigator();
 
-const stackoptions = ({ navigation }) => ({
-  headerBackTitleVisible: true,
-  headerStyle: {
-    backgroundColor: '#F44336',
-  },
-  headerTintColor: '#FFF',
-  headerTitleAlign: 'center',
-  headerTitleStyle: { fontSize: 16 },
-  headerLeft: () => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          navigation.goBack();
-        }}>
-        <View
-          style={{justifyContent: 'center', alignItems: 'center', margin:0}}>
-          <Ionicons name={'arrow-back-outline'} size={24} color={'#FFF'} />
-        </View>
-      </TouchableOpacity>
-    );
-  },
-});
 
 
 const HomeStack = () => {
   return (
     <Stack.Navigator
       initialRouteName={screens.ACCOUNT}
-      screenOptions={stackoptions}
+      screenOptions={StackOptions}
     >
       <Stack.Screen
         name={screens.ACCOUNT}
@@ -58,6 +35,7 @@ const HomeStack = () => {
         name={screens.SETTINGS}
         options={{ title: "Settings" }}
         component={SettingsScreen}
+        initialParams={null}
       />
 
       <Stack.Screen
