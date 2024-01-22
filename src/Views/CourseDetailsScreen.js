@@ -23,7 +23,7 @@ import { materialTheme } from "../constants";
 import { getCourseLessons, getSelectedCourse } from "../reducers/selectors";
 import {
   fetchLessonsBasedOnCurrentCourse, setSelectedLesson,
-  
+
 } from "../reducers/app.reducers";
 import { screens } from "../constants/screens";
 import { COLORS } from "../theme/colors";
@@ -56,21 +56,22 @@ const CourseDetails = ({ navigation }) => {
             return (
               <Block key={index.toString()} flex style={styles.shadow}>
                 <TouchableOpacity
+                  disabled={index !== 0}
                   onPress={() => handleOpenLesson(item)}
                   style={styles.lessonSection}
                 >
                   <Text color={theme.COLORS.BLACK}>
-                    <HTML source={{ html: item?.title?.rendered || "" }} />
+                    <HTML source={{ html: `<span style="color: ${index === 0 ? theme.COLORS.BLACK : COLORS.gray20};">${item?.title?.rendered || ""}</span>` }} />
                   </Text>
                 </TouchableOpacity>
               </Block>
             );
           })
         ) : (
-          <View style={{ flex: 1, alignItems:'center', justifyContent:'center' }}>
-          <Lottie ref={animationRef} style={{ height: 100}} source={require("../assets/JSON/empty.json")} />
-          <Text>Nothing to show here</Text>
-        </View>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Lottie ref={animationRef} style={{ height: 100 }} source={require("../assets/JSON/empty.json")} />
+            <Text>Nothing to show here</Text>
+          </View>
         )}
       </Block>
     );
