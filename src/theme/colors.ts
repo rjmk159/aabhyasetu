@@ -6,6 +6,7 @@ export const COLORS = {
   primary: "#F44336",
   brand:"#2c7ae0",
   secondary: "#F44336",
+  gray20: "#B5B5B5",
   gray25: "#F8F8F8",
   gray100: "#E1E1E1",
   gray500: "#717171",
