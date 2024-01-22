@@ -13,6 +13,7 @@ import {
   StatusBar,
   StyleSheet,
   ToastAndroid,
+  View,
   useColorScheme,
 } from "react-native";
 
@@ -20,7 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ListItem } from "@rneui/themed";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
-import { setGrade, setLanguage } from "../reducers/app.reducers";
+import { doLogout, setGrade, setLanguage } from "../reducers/app.reducers";
 
 import { Block, Button, Text, theme } from "galio-framework";
 import TouchableScale from "react-native-touchable-scale";
@@ -47,7 +48,10 @@ const mapToString = {
   11: "11th",
   12: "12th",
 };
-const SettingsScreen = () => {
+const SettingsScreen = ({ route }) => {
+
+  const { gradeAndLangNotSet } = route?.params
+
   const isDarkMode = useColorScheme() === "dark";
 
   const settings = useSelector(getProfileSettings);
@@ -77,21 +81,24 @@ const SettingsScreen = () => {
       ID: Number(profileDetails.id)
     }
     try {
-      const res =  await updateUserMeta(data, profileAuth.token);
+      const res = await updateUserMeta(data, profileAuth.token);
       setIsLoading(false);
       console.log(res)
-    if(res.success){
-      dispatch(setGrade(data.class));
-      dispatch(setLanguage(data.language));
+      if (res.success) {
+        dispatch(setGrade(data.class));
+        dispatch(setLanguage(data.language));
 
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'eLearning' }], // Replace with your initial route name
-      });
-    } else {
-      setStateGrade(settings.class);
-      setStateLanguage(settings.language)
-    }
+        {
+          !gradeAndLangNotSet &&
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'eLearning' }], // Replace with your initial route name
+            })
+        }
+      } else {
+        setStateGrade(settings.class);
+        setStateLanguage(settings.language)
+      }
       ToastAndroid.showWithGravity(res?.message, ToastAndroid.LONG, ToastAndroid.TOP);
 
     } catch (error) {
@@ -104,6 +111,11 @@ const SettingsScreen = () => {
     }
 
   }
+
+  const handleSignOut = () => {
+    dispatch(doLogout())
+  }
+
   return (
     <ScrollView
       contentContainerStyle={{ paddingBottom: 30 }}
@@ -193,6 +205,19 @@ const SettingsScreen = () => {
           </Text>
         </Button>
       </Block>
+      {gradeAndLangNotSet &&
+        <View style={styles.backToLogin}>
+          <Text style={[styles.backToLoginText]}>
+            Back to{" "}
+            <Text
+              onPress={handleSignOut}
+              style={{ color: COLORS.secondary, fontWeight: "600" }}
+            >
+              Login
+            </Text>
+          </Text>
+        </View>
+      }
     </ScrollView>
   );
 };
@@ -211,6 +236,14 @@ const styles = StyleSheet.create({
   },
   title: {
     margin: 20,
+  },
+  backToLogin: {
+    alignSelf: "center",
+    marginTop: 12
+  },
+  backToLoginText: {
+    textDecorationLine: "underline",
+    color: COLORS.gray500
   },
 });
 
