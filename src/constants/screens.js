@@ -10,5 +10,6 @@ export const screens = {
   LOGIN: "LOGIN",
   SIGNUP: "SIGNUP",
   FEEDBACK: "FEEDBACK",
+  MY_COURSES: "MY_COURSES"
   // LESSON_DETAILS: 'LESSON_DETAILS',
 };
