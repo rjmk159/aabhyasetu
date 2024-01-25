@@ -64,6 +64,11 @@ const SettingsScreen = () => {
       desc: "your details",
     },
     {
+      name: "My Courses",
+      link: screens.MY_COURSES,
+      desc: "Your courses",
+    },
+    {
       name: "Edit Profile",
       link: screens.PROFILE_EDIT,
       desc: "Modify your details",
@@ -167,25 +172,25 @@ const SettingsScreen = () => {
       </View>
       {/* Modal code */}
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-          onRequestClose={toggleModal}
-        >
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        onRequestClose={toggleModal}
+      >
 
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={{ color: COLORS.primary, fontSize: 20, textAlign: 'center', marginBottom: 10 }}>Are you sure you want to delete your account ?</Text>
-              <Text style={{ color: COLORS.black, fontSize: 12, textAlign: 'center', marginBottom: 20 }}>All account details including your payment details will be deleted, you won't be able to recover anything and you will be logged out from the account</Text>
-              <View style={{ flexDirection: 'row' }}>
-                <CommonButton wrapperStyle={styles.cancelbutton} title={"Cancel"} textStyle={{ color: "#fff", padding: 0 }} onPress={toggleModal} />
-                <CommonButton wrapperStyle={styles.deleteButton} textStyle={{ color: "#000", padding: 0 }} title={'Delete'} onPress={handleDelete} isLoading={isLoading}/>
-              </View>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={{ color: COLORS.primary, fontSize: 20, textAlign: 'center', marginBottom: 10 }}>Are you sure you want to delete your account ?</Text>
+            <Text style={{ color: COLORS.black, fontSize: 12, textAlign: 'center', marginBottom: 20 }}>All account details including your payment details will be deleted, you won't be able to recover anything and you will be logged out from the account</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <CommonButton wrapperStyle={styles.cancelbutton} title={"Cancel"} textStyle={{ color: "#fff", padding: 0 }} onPress={toggleModal} />
+              <CommonButton wrapperStyle={styles.deleteButton} textStyle={{ color: "#000", padding: 0 }} title={'Delete'} onPress={handleDelete} isLoading={isLoading} />
             </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
 
     </SafeAreaProvider >
@@ -230,7 +235,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
   },
-  cancelbutton: { width: 100, height: 25, margin: 10,backgroundColor:COLORS.primary },
+  cancelbutton: { width: 100, height: 25, margin: 10, backgroundColor: COLORS.primary },
   deleteButton: { width: 100, backgroundColor: '#ececec', height: 25, margin: 10 }
 
 

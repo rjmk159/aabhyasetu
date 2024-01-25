@@ -15,6 +15,7 @@ import EditProfile from "../Views/EditProfile";
 import FeedbackScreen from "../Views/FeedbackScreen";
 import SubjectsScreen from "../Views/SubjectsScreen";
 import StackOptions from "../components/StackOptions";
+import MyCourses from "../Views/MyCourses";
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +58,11 @@ const HomeStack = () => {
         name={screens.FEEDBACK}
         options={{ title: "Feedback" }}
         component={FeedbackScreen}
+      />
+      <Stack.Screen
+        name={screens.MY_COURSES}
+        options={{ title: "My Courses" }}
+        component={MyCourses}
       />
 
 
